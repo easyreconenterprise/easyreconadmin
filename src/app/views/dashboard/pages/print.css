@@ -1,0 +1,21 @@
+/* print.css */
+@media print {
+  .page-break {
+    page-break-before: always !important;
+  }
+
+  .print-cover {
+    page-break-before: always !important;
+  }
+  /* Any other print styles you have */
+}
+.print-button-container {
+  text-align: center;
+  margin: 20px auto;
+}
+
+button {
+  display: block;
+  margin: 0 auto;
+  /* Add any other button styles you need */
+}

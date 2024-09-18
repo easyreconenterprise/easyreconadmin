@@ -1,0 +1,15 @@
+.page-break {
+  page-break-before: always !important;
+}
+/* print.css */
+@media print {
+  .print-cover {
+    page-break-before: always !important;
+  }
+}
+/* print.css */
+@media print {
+  .no-print {
+    display: none;
+  }
+}
