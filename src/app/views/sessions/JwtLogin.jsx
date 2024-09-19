@@ -94,8 +94,10 @@ const JwtLogin = () => {
           <Grid item sm={6} xs={12} style={{ background: "#F9F9F9" }}>
             <JustifyBox p={4} height="100%" sx={{ minWidth: 320 }}>
               <img
-                src="/assets/images/illustrations/save.png"
-                width="50%"
+                // src="/assets/images/illustrations/save.png"
+
+                src="/assets/images/illustrations/er.png"
+                width="100%"
                 alt=""
               />
             </JustifyBox>
@@ -117,11 +119,27 @@ const JwtLogin = () => {
                   handleSubmit,
                 }) => (
                   <form onSubmit={handleSubmit}>
-                    <img
-                      src="/assets/images/illustrations/er.png"
-                      style={{ margin: "auto", width: "100%" }}
-                      alt=""
-                    />
+                    <bold>
+                      <h6
+                        style={{
+                          fontWeight: "700",
+                          fontSize: "20px",
+                          textAlign: "center",
+                        }}
+                      >
+                        Sign In to Easy Recon
+                      </h6>
+                    </bold>
+                    <bold>
+                      <h6
+                        style={{
+                          fontSize: "15px",
+                          textAlign: "center",
+                        }}
+                      >
+                        Take the easiest way to Reconcile your accounts
+                      </h6>
+                    </bold>
 
                     <br></br>
                     <TextField
@@ -136,6 +154,7 @@ const JwtLogin = () => {
                       onChange={handleChange}
                       helperText={touched.email && errors.email}
                       error={Boolean(errors.email && touched.email)}
+                      style={{ marginBottom: "20px" }}
                     />
                     <TextField
                       fullWidth
@@ -214,6 +233,12 @@ const JwtLogin = () => {
                         Forgot password?
                       </NavLink>
                     </FlexBox>
+                    <div>
+                      <div>
+                        <span>Dont have an account?</span>
+                        <a href="/session/signup">Register</a>
+                      </div>
+                    </div>
                   </form>
                 )}
               </Formik>
