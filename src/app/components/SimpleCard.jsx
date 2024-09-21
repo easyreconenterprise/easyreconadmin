@@ -3,7 +3,7 @@ import { Box, styled } from "@mui/system";
 
 const CardRoot = styled(Card)(() => ({
   height: "100%",
-  padding: "20px 24px",
+  // padding: "20px 24px",
 }));
 
 const CardTitle = styled("div")(({ subtitle }) => ({

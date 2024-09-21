@@ -70,6 +70,16 @@ export const navigations = [
         color: "#1a2038",
       },
       {
+        name: "Create Affliate",
+        path: "/dashboard/create-affliate",
+        color: "#1a2038",
+      },
+      {
+        name: "Create Domain",
+        path: "/dashboard/create-domain",
+        color: "#1a2038",
+      },
+      {
         name: "Notes 1 -3a",
         path: "/dashboard/note-1",
         color: "#1a2038",

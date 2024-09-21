@@ -7,6 +7,8 @@ import UnMappedTable from "./UnmappedTable";
 import Incomefs from "../fs/Incomefs";
 import NewFs from "../fs/NewFs";
 import axios from "axios";
+import { Button } from "@mui/material";
+import { Link } from "react-router-dom";
 // import FinancialSummary from './FinancialSummary'
 
 const Subcategory = {
@@ -269,6 +271,39 @@ const UnMappedData = ({}) => {
                   <p>{totalCredit.toFixed(2)}</p>
                 </td>
               </tr>
+              <tr>
+                <td className="closing">
+                  <p>11 time(s)</p>
+                  <input type="text" placeholder="0.0" />
+                </td>
+                <td className="debit">
+                  <p></p>
+                  <p></p>
+                </td>
+                <td className="credit">
+                  <p>0 time(s)</p>
+                  <p></p>
+                </td>
+              </tr>
+
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ marginLeft: "50px" }}
+              >
+                CANCEL
+              </Button>
+
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ marginLeft: "50px", color: "white" }}
+              >
+                <Link to="/dashboard/upload-excel" style={{ color: "white" }}>
+                  {" "}
+                  PROCEED
+                </Link>
+              </Button>
             </tbody>
           </table>
         </div>

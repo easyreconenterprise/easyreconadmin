@@ -438,7 +438,7 @@
 
 // export default Trial3;
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@mui/material";
@@ -446,13 +446,14 @@ import ExcelToJson from "./ExcelToJson";
 import UnMappedData from "./UnmappedData";
 import { SessionContext } from "app/components/MatxLayout/SwitchContext";
 
-const Trial3 = () => {
+const Trial3 = ({ session }) => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isNext, setIsNext] = useState(false);
   const [categorizedData, setCategorizedData] = useState([]);
   const [isMap, setIsMap] = useState(false);
   const [file, setFile] = useState(null); // Add state for the file
+  const [accountTitle, setAccountTitle] = useState("");
 
   const { currentSession } = useContext(SessionContext);
   console.log("Current session before uploading:", currentSession);
@@ -494,6 +495,40 @@ const Trial3 = () => {
   const headers = ["PostDate", "ValDate", "Details", "Debit", "Credit", "USID"]; // Define headers array
 
   const filteredData = data.map(({ switch: switchId, ...rest }) => rest); // Filter out 'switch' field
+  // Assuming session contains the account ID
+  const accountId = session?.account;
+
+  useEffect(() => {
+    const fetchAccountDetails = async () => {
+      if (accountId) {
+        try {
+          const token = localStorage.getItem("jwtToken");
+          const response = await axios.get(
+            `${apiUrl}/api/account/${accountId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          // Assuming the API response contains the accountTitle
+          const account = response.data;
+          if (account && account.accountTitle) {
+            setAccountTitle(account.accountTitle);
+          } else {
+            setAccountTitle("Account Not Found");
+          }
+        } catch (err) {
+          console.error("Error fetching account details:", err);
+
+          setAccountTitle("Error Fetching Account");
+        }
+      }
+    };
+
+    fetchAccountDetails();
+  }, [accountId, apiUrl]);
 
   return (
     <main>
@@ -509,7 +544,7 @@ const Trial3 = () => {
                 textTransform: "uppercase",
               }}
             >
-              Ledger Excel Upload for Demo Account
+              Ledger Excel Upload for {accountTitle} Account
             </h2>
           </b>
           <h2

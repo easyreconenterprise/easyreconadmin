@@ -215,186 +215,229 @@
 
 // export default Trial3
 
-import React, { useState, useEffect } from 'react'
-import { Button } from '@mui/material'
-import axios from 'axios'
-import UnMappedData from './UnmappedData'
-import { useNavigate } from 'react-router-dom'
-import ExcelToJson from './ExcelToJson'
-import Statement from '../Statement'
-import ExcelToStatement from './ExceltoStatement'
+import React, { useState, useEffect, useContext } from "react";
+import { Button } from "@mui/material";
+import axios from "axios";
+import UnMappedData from "./UnmappedData";
+import { useNavigate } from "react-router-dom";
+import ExcelToJson from "./ExcelToJson";
+import Statement from "../Statement";
+import ExcelToStatement from "./ExceltoStatement";
+import { SessionContext } from "app/components/MatxLayout/SwitchContext";
 
 const Trial = () => {
-    const navigate = useNavigate()
-    const [data, setData] = useState([])
-    const [isNext, setIsNext] = useState(false)
-    const [categorizedData, setCategorizedData] = useState([])
-    const [isMap, setIsMap] = useState(false)
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [isNext, setIsNext] = useState(false);
+  const [categorizedData, setCategorizedData] = useState([]);
+  const [isMap, setIsMap] = useState(false);
+  const [file, setFile] = useState(null); // Add state for the file
 
-    const handleDataChange = (jsonData) => {
-        setData(jsonData)
+  const { currentSession } = useContext(SessionContext);
+  console.log("Current session before uploading:", currentSession);
+
+  const handleDataChange = (jsonData) => {
+    setData(jsonData);
+  };
+
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  // const handleNextClick = async () => {
+  //     try {
+  //         if (data.length > 0) {
+  //             const formData = new FormData()
+  //             formData.append(
+  //                 'csvFile',
+  //                 new Blob([JSON.stringify(data)], {
+  //                     type: 'application/json',
+  //                 })
+  //             )
+
+  //             const jwtToken = localStorage.getItem('jwtToken')
+  //             const headers = {
+  //                 Authorization: `Bearer ${jwtToken}`,
+  //             }
+
+  //             const response = await axios.post(
+  //                 `${apiUrl}/api/upload/statement`,
+  //                 formData,
+  //                 {
+  //                     headers,
+  //                 }
+  //             )
+
+  //             console.log('Response after upload:', response.data) // Log the response from the server
+
+  //             const categorizedDataFromServer = response.data
+  //             setCategorizedData(categorizedDataFromServer)
+  //             setIsNext(true)
+  //             console.log('Navigating to /dashboard/statement...')
+  //             navigate('/dashboard/statement')
+  //         } else {
+  //             console.log(
+  //                 'No data uploaded. Cannot navigate to Statement page.'
+  //             )
+  //         }
+  //     } catch (err) {
+  //         console.error('Error uploading data:', err)
+  //     }
+  // }
+
+  const handleNextClick = async () => {
+    try {
+      if (file) {
+        const formData = new FormData();
+        formData.append("stmFile", file); // Ensure this matches the backend field name
+        formData.append("switch", currentSession._id); // Ensure this is correctly included
+
+        const jwtToken = localStorage.getItem("jwtToken");
+        const headers = {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "multipart/form-data",
+        };
+
+        const response = await axios.post(
+          `${apiUrl}/api/upload/statement`,
+          formData,
+          {
+            headers,
+          }
+        );
+
+        console.log("Response after upload:", response.data);
+        setCategorizedData(response.data);
+        setIsNext(true);
+        navigate("/dashboard/statement");
+      } else {
+        console.log("No file selected. Cannot proceed.");
+      }
+    } catch (err) {
+      console.error("Error uploading data:", err);
     }
+  };
+  const headers = ["PostDate", "ValDate", "Details", "Debit", "Credit", "USID"]; // Define headers array
 
-    const apiUrl = process.env.REACT_APP_API_URL
+  const filteredData = data.map(({ switch: switchId, ...rest }) => rest); // Filter out 'switch' field
 
-    const handleNextClick = async () => {
-        try {
-            if (data.length > 0) {
-                const formData = new FormData()
-                formData.append(
-                    'csvFile',
-                    new Blob([JSON.stringify(data)], {
-                        type: 'application/json',
-                    })
-                )
+  // const checkIfDataExistsInDatabase = async () => {
+  //     try {
+  //         const jwtToken = localStorage.getItem('jwtToken')
+  //         const headers = {
+  //             Authorization: `Bearer ${jwtToken}`,
+  //         }
 
-                const jwtToken = localStorage.getItem('jwtToken')
-                const headers = {
-                    Authorization: `Bearer ${jwtToken}`,
-                }
+  //         const response = await axios.get(
+  //             `${apiUrl}/api/check-statement-exists`,
+  //             {
+  //                 headers,
+  //             }
+  //         )
 
-                const response = await axios.post(
-                    `${apiUrl}/api/upload/statement`,
-                    formData,
-                    {
-                        headers,
-                    }
-                )
+  //         return response.data.exists
+  //     } catch (error) {
+  //         console.error('Error checking data in the database:', error)
+  //         return false
+  //     }
+  // }
 
-                console.log('Response after upload:', response.data) // Log the response from the server
+  // useEffect(() => {
+  //     let isMounted = true
 
-                const categorizedDataFromServer = response.data
-                setCategorizedData(categorizedDataFromServer)
-                setIsNext(true)
-                console.log('Navigating to /dashboard/statement...')
-                navigate('/dashboard/statement')
-            } else {
-                console.log(
-                    'No data uploaded. Cannot navigate to Statement page.'
-                )
-            }
-        } catch (err) {
-            console.error('Error uploading data:', err)
-        }
-    }
+  //     const fetchDataExists = async () => {
+  //         try {
+  //             const exists = await checkIfDataExistsInDatabase()
+  //             if (isMounted && exists) {
+  //                 setIsNext(true)
+  //                 console.log('Navigating to /dashboard/unmapped...')
+  //                 navigate('/dashboard/statement')
+  //             }
+  //         } catch (error) {
+  //             console.error('Error checking data in the database:', error)
+  //         }
+  //     }
 
-    const checkIfDataExistsInDatabase = async () => {
-        try {
-            const jwtToken = localStorage.getItem('jwtToken')
-            const headers = {
-                Authorization: `Bearer ${jwtToken}`,
-            }
+  //     fetchDataExists()
 
-            const response = await axios.get(
-                `${apiUrl}/api/check-statement-exists`,
-                {
-                    headers,
-                }
-            )
+  //     return () => {
+  //         isMounted = false
+  //     }
+  // }, [])
 
-            return response.data.exists
-        } catch (error) {
-            console.error('Error checking data in the database:', error)
-            return false
-        }
-    }
-
-    useEffect(() => {
-        let isMounted = true
-
-        const fetchDataExists = async () => {
-            try {
-                const exists = await checkIfDataExistsInDatabase()
-                if (isMounted && exists) {
-                    setIsNext(true)
-                    console.log('Navigating to /dashboard/unmapped...')
-                    navigate('/dashboard/statement')
-                }
-            } catch (error) {
-                console.error('Error checking data in the database:', error)
-            }
-        }
-
-        fetchDataExists()
-
-        return () => {
-            isMounted = false
-        }
-    }, [])
-
-    return (
-        <main>
-            {!isNext && (
-                <section style={{ marginTop: '50px' }}>
-                    <b>
-                        <h2
-                            style={{
-                                fontSize: '20px',
-                                marginBottom: '10px',
-                                marginLeft: '30px',
-                                fontWeight: '800',
-                                textTransform: 'uppercase',
-                            }}
-                        >
-                            Statement Excel Upload for Demo Account
-                        </h2>
-                    </b>
-                    <h2
-                        style={{
-                            fontSize: '15px',
-                            marginBottom: '30px',
-                            marginLeft: '30px',
-                        }}
-                    >
-                        Valid Format or Order(Postdate, Validate, Details,
-                        Amount or Postdate, Validate, Details, Debit, Credit)
-                    </h2>
-                    <ExcelToStatement
-                        setData={setData}
-                        setIsNext={setIsNext}
-                        onDataChange={handleDataChange}
-                        style={{ marginTop: '100px' }}
-                    />
-                </section>
-            )}
-            {isNext && (
-                <section>
-                    <Statement
-                        setCategorizedData={setCategorizedData}
-                        setData={setData}
-                        categorizedData={categorizedData}
-                        isMap={isMap}
-                        setIsMap={setIsMap}
-                    />
-                </section>
-            )}
-            {!isNext && (
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleNextClick}
-                    style={{ marginLeft: '50px' }}
-                >
-                    PROCESS
-                </Button>
-            )}
-
-            <Button
-                variant="contained"
-                color="primary"
-                style={{ marginLeft: '50px' }}
+  return (
+    <main>
+      {!isNext && (
+        <section style={{ marginTop: "50px" }}>
+          <b>
+            <h2
+              style={{
+                fontSize: "20px",
+                marginBottom: "10px",
+                marginLeft: "30px",
+                fontWeight: "800",
+                textTransform: "uppercase",
+              }}
             >
-                CANCEL
-            </Button>
-            <Button
-                variant="contained"
-                color="primary"
-                style={{ marginLeft: '50px' }}
-            >
-                SKIP
-            </Button>
-        </main>
-    )
-}
+              Statement Excel Upload for Demo Account
+            </h2>
+          </b>
+          <h2
+            style={{
+              fontSize: "15px",
+              marginBottom: "30px",
+              marginLeft: "30px",
+            }}
+          >
+            Valid Format or Order(Postdate, Validate, Details, Amount or
+            Postdate, Validate, Details, Debit, Credit)
+          </h2>
+          <ExcelToStatement
+            setData={setData}
+            setFile={setFile} // Pass setFile to update the file
+            onDataChange={handleDataChange}
+            style={{ marginTop: "100px" }}
+          />
+        </section>
+      )}
+      {isNext && (
+        <section>
+          <Statement
+            data={filteredData}
+            headers={headers}
+            setCategorizedData={setCategorizedData}
+            setData={setData}
+            categorizedData={categorizedData}
+            isMap={isMap}
+            setIsMap={setIsMap}
+          />
+        </section>
+      )}
+      {!isNext && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleNextClick}
+          style={{ marginLeft: "50px" }}
+        >
+          PROCESS
+        </Button>
+      )}
 
-export default Trial
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ marginLeft: "50px" }}
+      >
+        CANCEL
+      </Button>
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ marginLeft: "50px" }}
+      >
+        SKIP
+      </Button>
+    </main>
+  );
+};
+
+export default Trial;

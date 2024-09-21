@@ -120,6 +120,7 @@ const NewAccount = () => {
         },
       });
       toast.success("Account successfully created");
+      navigate("/dashboard/upload-excel-led"); // Navigate after successful creation
     } catch (err) {
       console.error("Error creating account:", err);
       toast.error("Unable to create account");

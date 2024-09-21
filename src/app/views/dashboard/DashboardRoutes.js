@@ -75,6 +75,8 @@ import Trial3 from "./import/Trial3";
 import Statement from "./Statement";
 import CreateAffiliate from "./pages/CreateAffliate";
 import CreateDomain from "./pages/CreateDomain";
+
+import StatementSummary from "./StatementSummary";
 // import SwitchAccount from 'app/components/MatxLayout/Layout1/SwitchAccount'
 
 const Analytics = Loadable(lazy(() => import("./Analytics")));
@@ -107,7 +109,7 @@ const dashboardRoutes = [
   { path: "/dashboard/table", element: <Table /> },
   { path: "/dashboard/profit-loss", element: <Profit /> },
   // { path: "/dashboard/tb", element: <OnlyMap /> },
-  { path: "/dashboard/tb", element: <ParentMapped /> },
+  { path: "/dashboard/AssistedMatching", element: <ParentMapped /> },
   { path: "/dashboard/AllMatchedItemReport", element: <AllMatch /> },
   { path: "/dashboard/frmOSReport", element: <FrmReport /> },
   { path: "/dashboard/profitandloss", element: <LossandProfit /> },
@@ -197,6 +199,7 @@ const dashboardRoutes = [
   { path: "/dashboard/excelfile", element: <ExcelToJson /> },
   { path: "/dashboard/unmapped", element: <UnMappedData /> },
   { path: "/dashboard/statement", element: <Statement /> },
+  { path: "/dashboard/reco-statement-summary", element: <StatementSummary /> },
   { path: "/dashboard/total", element: <MappedTotals /> },
   { path: "/dashboard/charge", element: <Charge /> },
   {

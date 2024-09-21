@@ -74,7 +74,6 @@ const CreateDomain = () => {
       });
 
       toast.success("Domain successfully created");
-      navigate("/dashboard/admin"); // Navigate after successful creation
     } catch (err) {
       console.error("Error creating domain:", err);
       toast.error("Error creating domain");
