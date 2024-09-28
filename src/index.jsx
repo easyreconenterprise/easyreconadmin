@@ -6,13 +6,19 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./app/App";
 import * as serviceWorker from "./serviceWorker";
 import { SessionProvider } from "./app//components/MatxLayout/SwitchContext"; // Adjust path as necessary
+import { DataProvider } from "app/views/dashboard/DataContext";
+import { MatchedItemsProvider } from "app/views/dashboard/MatchedItemsContext";
 
 ReactDOM.render(
   <StyledEngineProvider injectFirst>
     <BrowserRouter>
       <CssBaseline />
       <SessionProvider>
-        <App />
+        <DataProvider>
+          <MatchedItemsProvider>
+            <App />
+          </MatchedItemsProvider>
+        </DataProvider>
       </SessionProvider>
     </BrowserRouter>
   </StyledEngineProvider>,

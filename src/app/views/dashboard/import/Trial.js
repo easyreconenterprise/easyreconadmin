@@ -232,60 +232,27 @@ const Trial = () => {
   const [categorizedData, setCategorizedData] = useState([]);
   const [isMap, setIsMap] = useState(false);
   const [file, setFile] = useState(null); // Add state for the file
-
+  const [accountTitle, setAccountTitle] = useState("");
+  const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("0.0"); // Add state for balance
   const { currentSession } = useContext(SessionContext);
   console.log("Current session before uploading:", currentSession);
 
   const handleDataChange = (jsonData) => {
     setData(jsonData);
   };
-
+  useEffect(() => {
+    if (currentSession) {
+      console.log("Current session in Trial:", currentSession);
+      // Any logic that needs to happen when the session changes
+    }
+  }, [currentSession]);
   const apiUrl = process.env.REACT_APP_API_URL;
-
-  // const handleNextClick = async () => {
-  //     try {
-  //         if (data.length > 0) {
-  //             const formData = new FormData()
-  //             formData.append(
-  //                 'csvFile',
-  //                 new Blob([JSON.stringify(data)], {
-  //                     type: 'application/json',
-  //                 })
-  //             )
-
-  //             const jwtToken = localStorage.getItem('jwtToken')
-  //             const headers = {
-  //                 Authorization: `Bearer ${jwtToken}`,
-  //             }
-
-  //             const response = await axios.post(
-  //                 `${apiUrl}/api/upload/statement`,
-  //                 formData,
-  //                 {
-  //                     headers,
-  //                 }
-  //             )
-
-  //             console.log('Response after upload:', response.data) // Log the response from the server
-
-  //             const categorizedDataFromServer = response.data
-  //             setCategorizedData(categorizedDataFromServer)
-  //             setIsNext(true)
-  //             console.log('Navigating to /dashboard/statement...')
-  //             navigate('/dashboard/statement')
-  //         } else {
-  //             console.log(
-  //                 'No data uploaded. Cannot navigate to Statement page.'
-  //             )
-  //         }
-  //     } catch (err) {
-  //         console.error('Error uploading data:', err)
-  //     }
-  // }
 
   const handleNextClick = async () => {
     try {
       if (file) {
+        setData([]);
+        setCategorizedData([]);
         const formData = new FormData();
         formData.append("stmFile", file); // Ensure this matches the backend field name
         formData.append("switch", currentSession._id); // Ensure this is correctly included
@@ -315,53 +282,40 @@ const Trial = () => {
       console.error("Error uploading data:", err);
     }
   };
+  useEffect(() => {
+    const fetchAccountDetails = async () => {
+      if (currentSession?.account) {
+        console.log("Fetching account details for:", currentSession.account);
+        try {
+          const token = localStorage.getItem("jwtToken");
+          const response = await axios.get(
+            `${apiUrl}/api/account/${currentSession.account}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const account = response.data;
+          if (account) {
+            setAccountTitle(account.accountTitle || "Account Not Found");
+            setBalanceAsPerStmt(account.balanceAsPerStmt || "0.0"); // Set the balance here
+
+            console.log("Fetched Balance:", account.balanceAsPerStmt);
+          }
+        } catch (err) {
+          console.error("Error fetching account details:", err);
+          setAccountTitle("Error Fetching Account");
+        }
+      }
+    };
+
+    fetchAccountDetails();
+  }, [currentSession?.account, apiUrl]);
   const headers = ["PostDate", "ValDate", "Details", "Debit", "Credit", "USID"]; // Define headers array
 
   const filteredData = data.map(({ switch: switchId, ...rest }) => rest); // Filter out 'switch' field
-
-  // const checkIfDataExistsInDatabase = async () => {
-  //     try {
-  //         const jwtToken = localStorage.getItem('jwtToken')
-  //         const headers = {
-  //             Authorization: `Bearer ${jwtToken}`,
-  //         }
-
-  //         const response = await axios.get(
-  //             `${apiUrl}/api/check-statement-exists`,
-  //             {
-  //                 headers,
-  //             }
-  //         )
-
-  //         return response.data.exists
-  //     } catch (error) {
-  //         console.error('Error checking data in the database:', error)
-  //         return false
-  //     }
-  // }
-
-  // useEffect(() => {
-  //     let isMounted = true
-
-  //     const fetchDataExists = async () => {
-  //         try {
-  //             const exists = await checkIfDataExistsInDatabase()
-  //             if (isMounted && exists) {
-  //                 setIsNext(true)
-  //                 console.log('Navigating to /dashboard/unmapped...')
-  //                 navigate('/dashboard/statement')
-  //             }
-  //         } catch (error) {
-  //             console.error('Error checking data in the database:', error)
-  //         }
-  //     }
-
-  //     fetchDataExists()
-
-  //     return () => {
-  //         isMounted = false
-  //     }
-  // }, [])
 
   return (
     <main>
@@ -377,7 +331,7 @@ const Trial = () => {
                 textTransform: "uppercase",
               }}
             >
-              Statement Excel Upload for Demo Account
+              Statement Excel Upload for {accountTitle} Account
             </h2>
           </b>
           <h2

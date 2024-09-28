@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MappedTable from "./MappedTable";
 
 import "./Style.css";
@@ -9,6 +9,7 @@ import NewFs from "../fs/NewFs";
 import axios from "axios";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import { SessionContext } from "app/components/MatxLayout/SwitchContext";
 // import FinancialSummary from './FinancialSummary'
 
 const Subcategory = {
@@ -67,114 +68,49 @@ const Subcategory = {
   },
 };
 
-const UnMappedData = ({}) => {
-  const [draggedItem, setDraggedItem] = useState(null);
-
+const UnMappedData = () => {
   const [mappedData, setMappedData] = useState([]); // State to manage mapped data
-  const [categorizedData, setCategorizedData] = useState([]);
+
   const [data, setData] = useState([]);
-  const [Statement, setStatement] = useState(false);
+
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
 
-  const [subcategory, setSubcategory] = useState(Subcategory);
+  const { currentSession } = useContext(SessionContext);
+  const [balanceAsPerLedger, setBalanceAsPerLedger] = useState("0.0");
+
+  useEffect(() => {
+    if (currentSession?.account) {
+      const fetchAccountData = async () => {
+        try {
+          const token = localStorage.getItem("jwtToken");
+          const response = await axios.get(
+            `${apiUrl}/api/account/${currentSession.account}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const accountData = response.data;
+          console.log("Fetched Account Data:", accountData);
+
+          // Set the balance from the fetched account data
+          setBalanceAsPerLedger(accountData.balanceAsPerLedger || "0.0");
+        } catch (error) {
+          console.error("Error fetching account data:", error);
+        }
+      };
+
+      fetchAccountData();
+    }
+  }, [currentSession]);
 
   // console.log('unmapped', subcategory);
   const headers = data?.length > 0 ? Object.keys(data[0]) : [];
 
-  // const handleDrop = () => {
-  //   const updatedData = data.filter((item) => item !== draggedItem);
-
-  //   setData(updatedData);
-  //   console.log("Dropped data:", updatedData);
-  //   // Clear the dragged item from the state
-  //   setDraggedItem(null);
-  // };
   const apiUrl = process.env.REACT_APP_API_URL;
-
-  const handleDrop = async () => {
-    const updatedData = data.filter((item) => item !== draggedItem);
-
-    setData(updatedData);
-
-    if (draggedItem) {
-      const { Category, Subcategory, SubSubcategory } = draggedItem;
-
-      if (Subcategory) {
-        const updatedSubcategory = { ...subcategory };
-        if (SubSubcategory) {
-          updatedSubcategory[Category][Subcategory][SubSubcategory].push(
-            draggedItem
-          );
-        } else {
-          updatedSubcategory[Category][Subcategory].push(draggedItem);
-        }
-        setSubcategory(updatedSubcategory);
-
-        // Log the data before sending
-        console.log("Sending data to backend:", {
-          category: Category,
-          subcategory: Subcategory,
-          subSubcategory: SubSubcategory,
-          item: [draggedItem],
-        });
-
-        // Fetch the authentication token from wherever you've stored it (e.g., local storage)
-        const token = localStorage.getItem("jwtToken");
-        console.log("is token fetched", token);
-
-        // Include the token in the request headers
-        const headers = {
-          Authorization: `Bearer ${token}`,
-        };
-
-        // Make an API call to update the mapped data in the database
-        try {
-          const response = await axios.post(
-            `${apiUrl}/api/update-mapped-data`,
-            {
-              category: Category,
-              subcategory: Subcategory,
-              subSubcategory: SubSubcategory,
-              item: [draggedItem],
-            },
-            { headers } // Include the headers in the request
-          );
-
-          // Log the response from the backend
-          console.log("Response from backend:", response.data);
-
-          // Update the categorizedData state with the updated mapped data from the response
-          setCategorizedData(response.data);
-
-          // ... your existing code ...
-        } catch (error) {
-          console.error("Error updating mapped data:", error);
-          // ... your existing error handling ...
-        }
-      }
-    }
-    setDraggedItem(null);
-  };
-
-  const handleDragStart = (event, rowObject) => {
-    console.log("Drag started:", rowObject);
-    setDraggedItem(rowObject);
-    const rowJSON = JSON.stringify(rowObject); // Convert the object to JSON string
-    event.dataTransfer.setData("application/json", rowJSON);
-  };
-
-  const handleDropMapped = (droppedItem) => {
-    console.log("Dropped Item:", droppedItem);
-
-    // Remove the dropped item from mappedData and update state
-    setMappedData((prevMappedData) =>
-      prevMappedData.filter((item) => item !== droppedItem)
-    );
-
-    // Add the dropped item back to the unmapped table's data
-    setData((prevData) => [...prevData, droppedItem]);
-  };
 
   useEffect(() => {
     let cancelRequest = false; // Flag to track whether the component is unmounted
@@ -225,6 +161,37 @@ const UnMappedData = ({}) => {
     setTotalDebit(debitTotal);
     setTotalCredit(creditTotal);
   }, [data]);
+  const debitItemsCount = data.filter((row) => row.Debit).length;
+  const creditItemsCount = data.filter((row) => row.Credit).length;
+
+  useEffect(() => {
+    if (currentSession?.account) {
+      const fetchAccountData = async () => {
+        try {
+          const token = localStorage.getItem("jwtToken");
+          const response = await axios.get(
+            `${apiUrl}/api/account/${currentSession.account}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const accountData = response.data;
+          console.log("Fetched Account Data:", accountData);
+
+          // Set the balance from the fetched account data
+          setBalanceAsPerLedger(accountData.balanceAsPerLedger || "0.0");
+          setTotalDebit(accountData.totalDebitForCurrentFile || 0.0); // Only show current file's debit
+        } catch (error) {
+          console.error("Error fetching account data:", error);
+        }
+      };
+
+      fetchAccountData();
+    }
+  }, [currentSession]);
 
   return (
     <div className="containers bottom-scroll-container">
@@ -244,8 +211,6 @@ const UnMappedData = ({}) => {
               data={data}
               headers={headers}
               setData={setData}
-              handleDragStart={handleDragStart}
-              handleDropMapped={handleDropMapped} // Pass the function like this
               setMappedData={setMappedData}
               mappedData={mappedData}
             />
@@ -260,11 +225,11 @@ const UnMappedData = ({}) => {
               <tr>
                 <td className="closing">
                   <p>Closing Balance</p>
-                  <input type="text" placeholder="0.0" />
+                  <p> {balanceAsPerLedger}</p>
                 </td>
                 <td className="debit">
                   <p>Total Debit</p>
-                  <p>{totalDebit.toFixed(2)}</p>
+                  <p>-{totalDebit.toFixed(2)}</p>
                 </td>
                 <td className="credit">
                   <p>Total Credit</p>
@@ -272,16 +237,13 @@ const UnMappedData = ({}) => {
                 </td>
               </tr>
               <tr>
-                <td className="closing">
-                  <p>11 time(s)</p>
-                  <input type="text" placeholder="0.0" />
-                </td>
+                <td className="closing"></td>
                 <td className="debit">
-                  <p></p>
+                  <p>{debitItemsCount} time(s) Debit</p>
                   <p></p>
                 </td>
                 <td className="credit">
-                  <p>0 time(s)</p>
+                  <p>{creditItemsCount} time(s) Debit</p>
                   <p></p>
                 </td>
               </tr>
@@ -291,7 +253,13 @@ const UnMappedData = ({}) => {
                 color="primary"
                 style={{ marginLeft: "50px" }}
               >
-                CANCEL
+                <Link
+                  to="/dashboard/reco-ledger-summary"
+                  style={{ color: "white" }}
+                >
+                  {" "}
+                  CANCEL
+                </Link>
               </Button>
 
               <Button

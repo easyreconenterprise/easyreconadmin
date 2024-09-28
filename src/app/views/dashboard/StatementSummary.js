@@ -499,6 +499,9 @@ const StatementSummary = () => {
   const [statementData, setStatementData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("0.0");
+
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (currentSession) {
@@ -542,7 +545,33 @@ const StatementSummary = () => {
         });
     }
   }, [currentSession]);
+  useEffect(() => {
+    if (currentSession?.account) {
+      const fetchAccountData = async () => {
+        try {
+          const token = localStorage.getItem("jwtToken");
+          const response = await axios.get(
+            `${apiUrl}/api/account/${currentSession.account}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
 
+          const accountData = response.data;
+          console.log("Fetched Account Data:", accountData);
+
+          // Set the balance from the fetched account data
+          setBalanceAsPerStmt(accountData.balanceAsPerStmt || "0.0");
+        } catch (error) {
+          console.error("Error fetching account data:", error);
+        }
+      };
+
+      fetchAccountData();
+    }
+  }, [currentSession]);
   // Function to format date into Month and Year
   const formatDate = (date) => {
     const options = { month: "long", year: "numeric" };
@@ -643,11 +672,11 @@ const StatementSummary = () => {
               <TableRow>
                 <TableCell>Balance As Per Ledger</TableCell>
                 <TableCell align="center">Balance As Per Statement</TableCell>
-                <TableCell align="center"></TableCell>
+                <TableCell align="center"> </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>{balanceAsPerLedger}</TableCell>
-                <TableCell align="center">{balanceAsPerStatement}</TableCell>
+                <TableCell align="center"> {balanceAsPerStmt}</TableCell>
                 <TableCell align="center">{difference}</TableCell>
               </TableRow>
             </TableBody>

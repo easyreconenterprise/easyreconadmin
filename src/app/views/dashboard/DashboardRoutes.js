@@ -77,6 +77,7 @@ import CreateAffiliate from "./pages/CreateAffliate";
 import CreateDomain from "./pages/CreateDomain";
 
 import StatementSummary from "./StatementSummary";
+import LedgerSummary from "./LedgerSummary";
 // import SwitchAccount from 'app/components/MatxLayout/Layout1/SwitchAccount'
 
 const Analytics = Loadable(lazy(() => import("./Analytics")));
@@ -139,7 +140,13 @@ const dashboardRoutes = [
   { path: "/dashboard/frmNewAccount", element: <NewAccount /> },
   { path: "/dashboard/frmAccountDialog", element: <CreateAccount /> },
   { path: "/dashboard/create-domain", element: <CreateDomain /> },
-  { path: "/dashboard/AtmMatching", element: <AtmMatching /> },
+  {
+    path: "/dashboard/AtmMatching",
+    element: <AtmMatching />,
+  },
+
+  // Ensure that ledgerData and statementData are passed as props in your route definition
+
   // { path: '/dashboard', element: <SwitchAccount /> },
   { path: "/dashboard/default", element: <Cover /> },
   { path: "/dashboard/content", element: <Content /> },
@@ -200,6 +207,7 @@ const dashboardRoutes = [
   { path: "/dashboard/unmapped", element: <UnMappedData /> },
   { path: "/dashboard/statement", element: <Statement /> },
   { path: "/dashboard/reco-statement-summary", element: <StatementSummary /> },
+  { path: "/dashboard/reco-ledger-summary", element: <LedgerSummary /> },
   { path: "/dashboard/total", element: <MappedTotals /> },
   { path: "/dashboard/charge", element: <Charge /> },
   {

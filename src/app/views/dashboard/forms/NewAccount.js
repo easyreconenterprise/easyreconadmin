@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { styled } from "@mui/material/styles";
@@ -16,6 +16,7 @@ import { InputAdornment, IconButton } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Breadcrumb, SimpleCard } from "app/components";
 import SimpleTable from "app/views/material-kit/tables/SimpleTable";
+import { SessionContext } from "app/components/MatxLayout/SwitchContext";
 
 const Container = styled("div")(({ theme }) => ({
   margin: "30px",
@@ -42,6 +43,7 @@ const initialState = {
   internalRecord: "",
   externalRecord: "",
   balanceAsPerLedger: "",
+  balanceAsPerStmt: "",
   balanceAsPerLedgerDate: "",
   balanceAsPerStatementDate: "",
   accountCode: "",
@@ -52,15 +54,35 @@ const NewAccount = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState(initialState);
   const [classData, setClassData] = useState([]);
+  const { switchSession } = useContext(SessionContext);
   const [showPassword, setShowPassword] = useState(false);
   const [affiliates, setAffiliates] = useState([]);
   const [domains, setDomains] = useState([]);
 
   const [states, setStates] = useState({
-    checkedA: true,
+    checkedA: false,
     checkedB: true,
+    checkedC: false,
+    checkedD: true,
+    checkedE: true,
     checkedF: true,
-    checkedG: true,
+    checkedG: false,
+    checkedH: false,
+    checkedI: false,
+    checkedJ: false,
+    checkedK: false,
+    checkedL: true,
+    checkedM: false,
+    checkedN: false,
+    checkedO: false,
+    checkedP: false,
+    checkedQ: false,
+    checkedR: false,
+    checkedS: false,
+    checkedT: false,
+    checkedU: false,
+    checkedV: false,
+    checkedW: false,
   });
 
   const apiUrl = process.env.REACT_APP_API_URL.trim();
@@ -109,27 +131,74 @@ const NewAccount = () => {
     fetchDomains();
   }, [formData.affiliateId, apiUrl]);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const token = localStorage.getItem("jwtToken");
+
+  //   try {
+  //     const response = await axios.post(`${apiUrl}/api/account`, formData, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     const createdAccount = response.data; // Assuming the response contains the created account details
+
+  //     toast.success("Account successfully created");
+
+  //     // Switch to the newly created account as the current session
+  //     const newSession = {
+  //       affiliate: formData.affiliateId,
+  //       domain: formData.domainId,
+  //       account: createdAccount._id,
+  //       month: formData.balanceAsPerLedgerDate, // Use the ledger date for the month
+  //     };
+  //     await switchSession(newSession); // Update the session in context
+
+  //     navigate("/dashboard/upload-excel-led"); // Navigate after successful session switch
+  //   } catch (err) {
+  //     console.error("Error creating account:", err);
+  //     toast.error("Unable to create account");
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("jwtToken");
 
     try {
-      await axios.post(`${apiUrl}/api/account`, formData, {
+      // Create the account
+      const response = await axios.post(`${apiUrl}/api/account`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       toast.success("Account successfully created");
-      navigate("/dashboard/upload-excel-led"); // Navigate after successful creation
+
+      // Navigate based on balances
+      if (formData.balanceAsPerLedger && formData.balanceAsPerLedger !== "0") {
+        navigate("/dashboard/upload-excel-led"); // Upload ledger file
+      } else if (
+        formData.balanceAsPerStmt &&
+        formData.balanceAsPerStmt !== "0"
+      ) {
+        navigate("/dashboard/upload-excel-led"); // Upload statement file
+      } else {
+        toast.info("No balances detected. Please review account details.");
+      }
     } catch (err) {
       console.error("Error creating account:", err);
-      toast.error("Unable to create account");
+      if (err.response && err.response.data && err.response.data.error) {
+        toast.error(err.response.data.error); // Display backend error message
+      } else {
+        toast.error("Unable to create account");
+      }
     }
   };
 
   const handleChanges = (name) => (event) => {
     setStates((prevState) => ({ ...prevState, [name]: event.target.checked }));
   };
+  const isSuspenseAccount = states.checkedC; // Update according to your checkbox names
 
   return (
     <Container>
@@ -200,7 +269,12 @@ const NewAccount = () => {
                   variant="outlined"
                   value={formData.externalAccount}
                   onChange={handleChange}
-                  sx={{ mb: 3 }}
+                  sx={{
+                    mb: 3,
+                    backgroundColor: isSuspenseAccount ? "yellow" : "white",
+                  }}
+                  disabled={isSuspenseAccount}
+                  // sx={{ mb: 3 }}
                 />
                 <label>Account Title</label>
                 <TextField
@@ -289,6 +363,22 @@ const NewAccount = () => {
                   onChange={handleChange}
                   sx={{ mb: 3 }}
                 />
+                <label>Balance As Per Stmt</label>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="text"
+                  name="balanceAsPerStmt"
+                  label="Balance As Per Stmt"
+                  variant="outlined"
+                  value={formData.balanceAsPerStmt}
+                  onChange={handleChange}
+                  sx={{
+                    mb: 3,
+                    backgroundColor: isSuspenseAccount ? "yellow" : "white",
+                  }}
+                  disabled={isSuspenseAccount}
+                />
                 <label>Balance As Per Statement Date</label>
                 <TextField
                   fullWidth
@@ -299,7 +389,11 @@ const NewAccount = () => {
                   variant="outlined"
                   value={formData.balanceAsPerStatementDate}
                   onChange={handleChange}
-                  sx={{ mb: 3 }}
+                  sx={{
+                    mb: 3,
+                    backgroundColor: isSuspenseAccount ? "yellow" : "white",
+                  }}
+                  disabled={isSuspenseAccount}
                 />
                 <label>Account Code</label>
                 <TextField
@@ -333,7 +427,190 @@ const NewAccount = () => {
                       value="checkedA"
                     />
                   }
-                  label="Zero balance with outstanding item"
+                  label="Zero balance with outstanding items"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedB}
+                      onChange={handleChanges("checkedB")}
+                      value="checkedB"
+                    />
+                  }
+                  label="Normal Account"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedC}
+                      onChange={handleChanges("checkedC")}
+                      value="checkedC"
+                    />
+                  }
+                  label="Suspense Account"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedD}
+                      onChange={handleChanges("checkedD")}
+                      value="checkedD"
+                    />
+                  }
+                  label="Allow Change Working Month"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedE}
+                      onChange={handleChanges("checkedE")}
+                      value="checkedE"
+                    />
+                  }
+                  label="Allow Download Service"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedF}
+                      onChange={handleChanges("checkedF")}
+                      value="checkedF"
+                    />
+                  }
+                  label="Allow Matching Service"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedG}
+                      onChange={handleChanges("checkedG")}
+                      value="checkedG"
+                    />
+                  }
+                  label="Run End of Year"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedH}
+                      onChange={handleChanges("checkedH")}
+                      value="checkedH"
+                    />
+                  }
+                  label="Allow Dirty Matching"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedI}
+                      onChange={handleChanges("checkedI")}
+                      value="checkedI"
+                    />
+                  }
+                  label="Matching Level"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedJ}
+                      onChange={handleChanges("checkedJ")}
+                      value="checkedJ"
+                    />
+                  }
+                  label="Internal Download by Period"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedK}
+                      onChange={handleChanges("checkedK")}
+                      value="checkedK"
+                    />
+                  }
+                  label="External Download by Period"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedL}
+                      onChange={handleChanges("checkedL")}
+                      value="checkedL"
+                    />
+                  }
+                  label="Enable Dashboard"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedM}
+                      onChange={handleChanges("checkedM")}
+                      value="checkedM"
+                    />
+                  }
+                  label="Ledger Edit Closing Balance"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedN}
+                      onChange={handleChanges("checkedN")}
+                      value="checkedN"
+                    />
+                  }
+                  label="Statement Edit Closing Balance"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedO}
+                      onChange={handleChanges("checkedO")}
+                      value="checkedO"
+                    />
+                  }
+                  label="Ledg. Download using sequence"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedP}
+                      onChange={handleChanges("checkedP")}
+                      value="checkedP"
+                    />
+                  }
+                  label="Stmt. Download using sequence"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedQ}
+                      onChange={handleChanges("checkedQ")}
+                      value="checkedQ"
+                    />
+                  }
+                  label="Enable Cash Analysis"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedR}
+                      onChange={handleChanges("checkedR")}
+                      value="checkedR"
+                    />
+                  }
+                  label="Auto Adjust Balance(Ledger)"
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkedS}
+                      onChange={handleChanges("checkedS")}
+                      value="checkedS"
+                    />
+                  }
+                  label="Auto Adjust Balance(Stmt)"
                 />
                 {/* Add more FormControlLabels if needed */}
               </Grid>
