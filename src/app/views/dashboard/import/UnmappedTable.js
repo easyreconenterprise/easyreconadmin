@@ -154,7 +154,7 @@ const UnMappedTable = ({
 
   return (
     <>
-      <table>
+      <table style={{ margin: "auto" }}>
         <thead>
           <tr>
             {headers?.map((header) => (

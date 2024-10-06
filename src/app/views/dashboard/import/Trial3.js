@@ -245,7 +245,10 @@ const Trial3 = () => {
   const handleDataChange = (jsonData) => {
     setData(jsonData);
   };
-  const filteredData = data.map(({ switch: switchId, ...rest }) => rest);
+  // const filteredData = data.map(({ switch: switchId, ...rest }) => rest);
+  const filteredData = data.map(
+    ({ switch: switchId, uploadSessionId, ...rest }) => rest
+  );
 
   const headers = ["PostDate", "ValDate", "Details", "Debit", "Credit", "USID"]; // Define headers array
   return (

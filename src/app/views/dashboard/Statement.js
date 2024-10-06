@@ -75,8 +75,12 @@ const Statement = ({}) => {
   const { currentSession } = useContext(SessionContext);
   const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("0.0");
 
-  // console.log('unmapped', subcategory);
-  const headers = data?.length > 0 ? Object.keys(data[0]) : [];
+  const headers =
+    data?.length > 0
+      ? Object.keys(data[0]).filter(
+          (key) => key !== "switch" && key !== "uploadSessionId"
+        )
+      : [];
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -208,6 +212,9 @@ const Statement = ({}) => {
   }, [data]);
   const debitItemsCount = data.filter((row) => row.Debit).length;
   const creditItemsCount = data.filter((row) => row.Credit).length;
+  const filteredData = data.map(
+    ({ switch: switchId, uploadSessionId, ...rest }) => rest
+  );
 
   return (
     <div className="containers bottom-scroll-container">
@@ -224,7 +231,7 @@ const Statement = ({}) => {
         {data?.length > 0 ? (
           <>
             <UnMappedStatement
-              data={data}
+              data={filteredData}
               headers={headers}
               setData={setData}
               setMappedData={setMappedData}

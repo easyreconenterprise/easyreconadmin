@@ -315,8 +315,9 @@ const Trial = () => {
   }, [currentSession?.account, apiUrl]);
   const headers = ["PostDate", "ValDate", "Details", "Debit", "Credit", "USID"]; // Define headers array
 
-  const filteredData = data.map(({ switch: switchId, ...rest }) => rest); // Filter out 'switch' field
-
+  const filteredData = data.map(
+    ({ switch: switchId, uploadSessionId, ...rest }) => rest
+  );
   return (
     <main>
       {!isNext && (

@@ -108,7 +108,14 @@ const UnMappedData = () => {
   }, [currentSession]);
 
   // console.log('unmapped', subcategory);
-  const headers = data?.length > 0 ? Object.keys(data[0]) : [];
+  // const headers = data?.length > 0 ? Object.keys(data[0]) : [];
+
+  const headers =
+    data?.length > 0
+      ? Object.keys(data[0]).filter(
+          (key) => key !== "switch" && key !== "uploadSessionId"
+        )
+      : [];
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -193,90 +200,96 @@ const UnMappedData = () => {
     }
   }, [currentSession]);
 
+  const filteredData = data.map(
+    ({ switch: switchId, uploadSessionId, ...rest }) => rest
+  );
+
   return (
-    <div className="containers bottom-scroll-container">
-      <div className="lefts" style={{ marginBottom: "150px" }}>
-        <h2
-          style={{
-            fontSize: "20px",
-            fontWeight: "700",
-            marginTop: "40px",
-          }}
-        >
-          Ledger Account Data
-        </h2>
-        {data?.length > 0 ? (
-          <>
-            <UnMappedTable
-              data={data}
-              headers={headers}
-              setData={setData}
-              setMappedData={setMappedData}
-              mappedData={mappedData}
-            />
-          </>
-        ) : (
-          <div>Table is Empty</div>
-        )}
+    <>
+      <div className="containers bottom-scroll-container">
+        <div style={{ marginBottom: "150px" }}>
+          <h2
+            style={{
+              fontSize: "20px",
+              fontWeight: "700",
+              marginTop: "40px",
+            }}
+          >
+            Ledger Account Data
+          </h2>
+          {data?.length > 0 ? (
+            <>
+              <UnMappedTable
+                data={filteredData}
+                // data={data}
+                headers={headers}
+                setData={setData}
+                setMappedData={setMappedData}
+                mappedData={mappedData}
+              />
+            </>
+          ) : (
+            <div>Table is Empty</div>
+          )}
 
-        <div className="all">
-          <table>
-            <tbody>
-              <tr>
-                <td className="closing">
-                  <p>Closing Balance</p>
-                  <p> {balanceAsPerLedger}</p>
-                </td>
-                <td className="debit">
-                  <p>Total Debit</p>
-                  <p>-{totalDebit.toFixed(2)}</p>
-                </td>
-                <td className="credit">
-                  <p>Total Credit</p>
-                  <p>{totalCredit.toFixed(2)}</p>
-                </td>
-              </tr>
-              <tr>
-                <td className="closing"></td>
-                <td className="debit">
-                  <p>{debitItemsCount} time(s) Debit</p>
-                  <p></p>
-                </td>
-                <td className="credit">
-                  <p>{creditItemsCount} time(s) Debit</p>
-                  <p></p>
-                </td>
-              </tr>
-
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ marginLeft: "50px" }}
+          <div className="all">
+            <table>
+              <tbody>
+                <tr>
+                  <td className="closing">
+                    <p>Closing Balance</p>
+                    <p> {balanceAsPerLedger}</p>
+                  </td>
+                  <td className="debit">
+                    <p>Total Debit</p>
+                    <p>-{totalDebit.toFixed(2)}</p>
+                  </td>
+                  <td className="credit">
+                    <p>Total Credit</p>
+                    <p>{totalCredit.toFixed(2)}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="closing"></td>
+                  <td className="debit">
+                    <p>{debitItemsCount} time(s) Debit</p>
+                    <p></p>
+                  </td>
+                  <td className="credit">
+                    <p>{creditItemsCount} time(s) Debit</p>
+                    <p></p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="button-container" style={{ fload: "right" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ color: "white" }}
+            >
+              <Link
+                to="/dashboard/reco-ledger-summary"
+                style={{ color: "white" }}
               >
-                <Link
-                  to="/dashboard/reco-ledger-summary"
-                  style={{ color: "white" }}
-                >
-                  {" "}
-                  CANCEL
-                </Link>
-              </Button>
+                CANCEL
+              </Link>
+            </Button>
 
-              <Button
-                variant="contained"
-                color="primary"
-                style={{ marginLeft: "50px", color: "white" }}
-              >
-                <Link to="/dashboard/upload-excel" style={{ color: "white" }}>
-                  {" "}
-                  PROCEED
-                </Link>
-              </Button>
-            </tbody>
-          </table>
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ marginLeft: "20px", color: "white" }}
+            >
+              <Link to="/dashboard/upload-excel" style={{ color: "white" }}>
+                PROCEED
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

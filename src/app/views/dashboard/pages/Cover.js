@@ -92,6 +92,8 @@ const Cover = () => {
   const [balanceAsPerLedgerDate, setBalanceAsPerLedgerDate] = useState("0.0");
   const [balanceAsPerStatementDate, setBalanceAsPerStatementDate] =
     useState("0.0");
+  const [lastLedgerDate, setLastLedgerDate] = useState(null);
+  const [lastStatementDate, setLastStatementDate] = useState(null);
 
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
@@ -232,6 +234,62 @@ const Cover = () => {
       fetchAccountData();
     }
   }, [currentSession]);
+  useEffect(() => {
+    const fetchLastUploadedDates = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+
+        // Fetch the last statement date
+        const statementResponse = await axios.get(
+          `${apiUrl}/api/laststatement`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Fetch the last ledger date
+        const ledgerResponse = await axios.get(`${apiUrl}/api/lastledger`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Extract uploadedAt dates
+        const lastStatementUploadedAt = statementResponse.data.uploadedAt;
+        const lastLedgerUploadedAt = ledgerResponse.data.uploadedAt;
+
+        // Format and set the dates in state
+        setLastStatementDate(
+          lastStatementUploadedAt
+            ? new Date(lastStatementUploadedAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A"
+        );
+
+        setLastLedgerDate(
+          lastLedgerUploadedAt
+            ? new Date(lastLedgerUploadedAt).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A"
+        );
+
+        console.log("Last statement uploaded at:", lastStatementUploadedAt);
+        console.log("Last ledger uploaded at:", lastLedgerUploadedAt);
+      } catch (error) {
+        console.error("Error fetching last uploaded dates:", error);
+      }
+    };
+
+    fetchLastUploadedDates();
+  }, []);
 
   return (
     <div>
@@ -300,10 +358,14 @@ const Cover = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell align="left">
-                          {balanceAsPerLedgerDate}
+                          {lastLedgerDate
+                            ? lastLedgerDate
+                            : "{setBalanceAsPerLedgerDate}"}
                         </TableCell>
                         <TableCell align="left">
-                          {balanceAsPerStatementDate}
+                          {lastStatementDate
+                            ? lastStatementDate
+                            : "{setBalanceAsPerStatementDate}"}
                         </TableCell>
                       </TableRow>
                     </TableBody>
