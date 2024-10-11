@@ -8,6 +8,7 @@ import * as serviceWorker from "./serviceWorker";
 import { SessionProvider } from "./app//components/MatxLayout/SwitchContext"; // Adjust path as necessary
 import { DataProvider } from "app/views/dashboard/DataContext";
 import { MatchedItemsProvider } from "app/views/dashboard/MatchedItemsContext";
+import { RuleProvider } from "app/views/dashboard/pages/RuleContext";
 
 ReactDOM.render(
   <StyledEngineProvider injectFirst>
@@ -16,7 +17,9 @@ ReactDOM.render(
       <SessionProvider>
         <DataProvider>
           <MatchedItemsProvider>
-            <App />
+            <RuleProvider>
+              <App />
+            </RuleProvider>
           </MatchedItemsProvider>
         </DataProvider>
       </SessionProvider>
