@@ -7,7 +7,7 @@ export const RuleProvider = ({ children }) => {
     exactMatch: false,
     probableMatch: false,
     similarDetails: false,
-    manyToMany: false,
+    manyToOne: false,
     userDefined: false,
   });
 
@@ -16,7 +16,7 @@ export const RuleProvider = ({ children }) => {
       rules.exactMatch ||
       rules.probableMatch ||
       rules.similarDetails ||
-      rules.manyToMany ||
+      rules.manyToOne ||
       rules.userDefined
     );
   };
