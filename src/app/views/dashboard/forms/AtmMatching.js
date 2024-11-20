@@ -135,7 +135,7 @@ const manyToOneMatch = (ledger, statement) => {
 
 
    if (states.manyToOne) {
-     console.log('this', manyToOneMatch(ledgerData, statementData))
+     manyToOneMatch(ledgerData, statementData);
    }
 
   ledgerData.forEach((ledgerItem) => {
