@@ -64,7 +64,7 @@ const ExcelToJson = ({ setData, setFile }) => {
               type="file"
               id="file"
               name="csvFile"
-              accept=".csv"
+              accept=".csv .xlsx"
               onChange={handleFileUpload}
             />
             <Typography variant="subtitle1">Date Filter</Typography>

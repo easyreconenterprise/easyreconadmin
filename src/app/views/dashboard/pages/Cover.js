@@ -358,14 +358,10 @@ const Cover = () => {
                     <TableBody>
                       <TableRow>
                         <TableCell align="left">
-                          {lastLedgerDate
-                            ? lastLedgerDate
-                            : "{setBalanceAsPerLedgerDate}"}
+                          {lastLedgerDate ? lastLedgerDate : "-"}
                         </TableCell>
                         <TableCell align="left">
-                          {lastStatementDate
-                            ? lastStatementDate
-                            : "{setBalanceAsPerStatementDate}"}
+                          {lastStatementDate ? lastStatementDate : "-"}
                         </TableCell>
                       </TableRow>
                     </TableBody>

@@ -115,7 +115,7 @@ const ExcelToStatement = ({ setData, setIsNext, setFile }) => {
               type="file"
               id="file"
               name="stmFile"
-              accept=".csv"
+              accept=".csv .xlsx"
               onChange={handleFileUpload}
             />
             <Typography variant="subtitle1">Date Filter</Typography>

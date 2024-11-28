@@ -6,7 +6,7 @@
 // import { useData } from "../DataContext";
 // import { useMatchedItems } from "../MatchedItemsContext";
 // import { FormControl, Grid, InputLabel, MenuItem, Select } from "@mui/material";
-
+// import { useNavigate } from "react-router-dom";
 // const ParentMapped = () => {
 //   // const [ledgerData, setLedgerData] = useState([]); // For Ledger
 //   const { ledgerData, setLedgerData, statementData, setStatementData } =
@@ -14,11 +14,14 @@
 //   const { matchedItems, setMatchedItems } = useMatchedItems();
 //   // const [statementData, setStatementData] = useState([]); // For Statement
 //   const [loading, setLoading] = useState(true);
+//   const [exactMatches, setExactMatches] = useState([]);
+//   const [matchedStatements, setMatchedStatements] = useState([]);
 //   const [error, setError] = useState(null);
 //   const { logout, user } = useAuth();
 //   const { currentSession } = useContext(SessionContext); // Assuming you have this session context
 //   const apiUrl = process.env.REACT_APP_API_URL;
 //   const [dateFilter, setDateFilter] = useState("allItems"); // Initialize dateFilter state
+//   const navigate = useNavigate(); // Hook for navigation
 
 //   useEffect(() => {
 //     const fetchLedgerAndStatement = async () => {
@@ -71,10 +74,6 @@
 
 //         console.log("Statement response:", statementResponse.data);
 
-//         // If response is an object, convert it into an array to map over
-//         // setStatementData([statementResponse.data]);
-//         // setStatementData(statementResponse.data);
-
 //         setStatementData(
 //           Array.isArray(statementResponse.data)
 //             ? statementResponse.data
@@ -112,6 +111,19 @@
 //           // Exact match logic
 //           return item.Debit === match.Credit && item.USID === match.USID;
 //         }
+//         if (matchType === "similardetails") {
+//           // Similar details match logic
+//           return (
+//             item.USID === match.USID &&
+//             (type === "ledger"
+//               ? item.Debit === match.Credit
+//               : item.Credit === match.Debit) &&
+//             item.PostDate === match.PostDate &&
+//             item.Details?.trim().toLowerCase() ===
+//               match.Details?.trim().toLowerCase() &&
+//             item.ValDate === match.ValDate
+//           );
+//         }
 //       }
 //       if (type === "statement") {
 //         if (matchType === "probable") {
@@ -122,42 +134,53 @@
 //           // Exact match logic
 //           return item.Credit === match.Debit && item.USID === match.USID;
 //         }
+//         if (matchType === "similardetails") {
+//           // Exact match logic
+//           return (
+//             item.Debit === match.Credit &&
+//             item.USID === match.USID &&
+//             item.PostDate === match.PostDate &&
+//             item.Details === match.Details &&
+//             item.ValDate === match.ValDate
+//           );
+//         }
 //       }
+//       if (type === "ledger" || type === "statement") {
+//         if (matchType === "manyToOne") {
+//           // Many-to-One match logic
+//           const relevantMatches = matchedItems.filter(
+//             (match) => match.USID === item.USID
+//           );
+
+//           if (type === "ledger") {
+//             const totalDebit = relevantMatches.reduce(
+//               (sum, match) => sum + match.Debit,
+//               0
+//             );
+//             return totalDebit === item.Credit;
+//           }
+
+//           if (type === "statement") {
+//             const totalCredit = relevantMatches.reduce(
+//               (sum, match) => sum + match.Credit,
+//               0
+//             );
+//             return totalCredit === item.Debit;
+//           }
+//         }
+//       }
+
 //       return false;
 //     });
 //   };
 
-//   // useEffect(() => {
-//   //   console.log("Matched items:", matchedItems);
-//   // }, [matchedItems]);
-//   // const isMatched = (ledgerItem, statementData) => {
-//   //   // Ensure statementData is an array
-//   //   if (!Array.isArray(statementData)) {
-//   //     console.warn("statementData is not an array:", statementData);
-//   //     return false;
-//   //   }
-
-//   //   // Compare the Debit from ledgerData with the Credit from statementData
-//   //   return statementData.some(
-//   //     (statementItem) =>
-//   //       ledgerItem.Debit === statementItem.Credit &&
-//   //       ledgerItem.USID === statementItem.USID
-//   //   );
-//   // };
-//   // const isMatched = (ledgerItem, statementData) => {
-//   //   if (!Array.isArray(statementData)) {
-//   //     console.warn("statementData is not an array:", statementData);
-//   //     return false;
-//   //   }
-
-//   //   return statementData.some(
-//   //     (statementItem) =>
-//   //       ledgerItem.Debit === statementItem.Credit &&
-//   //       ledgerItem.USID === statementItem.USID // Ensure you're comparing the correct fields
-//   //   );
-//   // };
 //   const handleDateFilterChange = (event) => {
-//     setDateFilter(event.target.value);
+//     const filter = event.target.value;
+//     setDateFilter(filter);
+
+//     if (filter === "unmatched") {
+//       navigate(`/dashboard/unmatched-item`); // Navigate to unmatched items route
+//     }
 //   };
 
 //   useEffect(() => {
@@ -174,7 +197,7 @@
 
 //       try {
 //         const response = await axios.get(
-//           `${apiUrl}/api/mathes/${switchId}?type=${dateFilter}`,
+//           `${apiUrl}/api/matches/${switchId}?type=${dateFilter}`,
 //           {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
@@ -184,12 +207,25 @@
 
 //         if (response.data.success) {
 //           const data = response.data.data;
-//           // Ensure data is an array
-//           if (data?.exactMatches && Array.isArray(data.exactMatches)) {
-//             setMatchedItems(data.exactMatches);
+//           // Ensure data has exactMatches and matchedStatements arrays
+//           if (Array.isArray(data.exactMatches)) {
+//             setExactMatches(data.exactMatches); // Ledger matches
 //           } else {
-//             console.warn("Expected an array, but received:", data);
-//             setMatchedItems([]); // Reset to empty array if not an array
+//             console.warn(
+//               "Expected an array for exactMatches, but received:",
+//               data.exactMatches
+//             );
+//             setExactMatches([]);
+//           }
+
+//           if (Array.isArray(data.matchedStatements)) {
+//             setMatchedStatements(data.matchedStatements); // Statement matches
+//           } else {
+//             console.warn(
+//               "Expected an array for matchedStatements, but received:",
+//               data.matchedStatements
+//             );
+//             setMatchedStatements([]);
 //           }
 
 //           console.log("Fetched matched items:", data);
@@ -201,30 +237,6 @@
 
 //     fetchMatchedItems();
 //   }, [currentSession, dateFilter, apiUrl]);
-
-//   // const filteredItems = matchedItems.filter((item) => {
-//   //   switch (dateFilter) {
-//   //     case "unmatched":
-//   //       return item.status === "unmatched";
-//   //     case "allMatched":
-//   //       return item.status === "matched";
-//   //     case "probable":
-//   //       return item.status === "probable";
-//   //     case "reversal":
-//   //       return item.status === "reversal";
-//   //     case "manualMatched":
-//   //       return item.matchType === "manual";
-//   //     case "autoMatched":
-//   //       return item.matchType === "auto";
-//   //     case "partiallyMatched":
-//   //       return item.status === "partiallyMatched";
-//   //     case "partiallyReversed":
-//   //       return item.status === "partiallyReversed";
-//   //     case "allItems":
-//   //     default:
-//   //       return true; // Return all items if no specific filter is selected
-//   //   }
-//   // });
 
 //   const filteredItems = Array.isArray(matchedItems)
 //     ? matchedItems.filter((item) => {
@@ -280,13 +292,12 @@
 //           </Select>
 //         </FormControl>
 //       </Grid>
-
 //       <div
 //         style={{ display: "flex" }}
 //         className="containers bottom-scroll-container"
 //       >
 //         {/* Ledger Section */}
-//         <div style={{ flexBasis: "50%" }}>
+//         <div style={{ flexBasis: "50%", marginRight: "30px" }}>
 //           <div
 //             style={{
 //               margin: "20px 0", // reduce top/bottom margin
@@ -299,7 +310,6 @@
 //             <div>
 //               <h5>Ledger</h5>
 //             </div>
-
 //             <div
 //               style={{
 //                 display: "flex",
@@ -312,11 +322,8 @@
 //               }}
 //             >
 //               <h5 style={{ margin: "0 10px" }}>Page 1 of 1</h5>
-//               <h5 style={{ margin: "0 10px" }}>
-//                 0 of {ledgerData.length} Records Matched
-//               </h5>
+//               <h5 style={{ margin: "0 10px" }}>0 of 38 Records</h5>
 //             </div>
-
 //             <div
 //               style={{
 //                 borderRadius: "30px",
@@ -325,44 +332,23 @@
 //                 color: "white",
 //               }}
 //             >
-//               <p style={{ margin: 0 }}>{ledgerData.length} item(s)</p>
+//               <p style={{ margin: 0 }}>369 item(s)</p>
 //             </div>
 //           </div>
 
-//           {loading ? (
-//             <p>Loading ledger...</p>
-//           ) : ledgerData.length > 0 ? (
-//             <table>
-//               <thead>
-//                 <tr>
-//                   <th></th>
-//                   <th></th>
-//                   <th>Date</th>
-//                   <th>Details</th>
-//                   <th>Amount</th>
-//                   <th>UID</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {ledgerData.map((data, index) => (
+//           <table>
+//             <tbody>
+//               {(dateFilter === "allMatched" ? exactMatches : ledgerData).map(
+//                 (data, index) => (
 //                   <tr
 //                     key={index}
 //                     style={{
-//                       // backgroundColor: isMatched(data, "ledger")
-//                       //   ? "#d1ffd1"
-//                       //   : "#ffd1d1", // Green for matched, red for unmatched
-
 //                       backgroundColor:
 //                         dateFilter === "allMatched" &&
 //                         isMatched(data, "ledger", "exact")
-//                           ? "lightblue" // Blue background for matched items
-//                           : "white", // White for unmatched
+//                           ? "lightblue"
+//                           : "white",
 //                     }}
-//                     // style={{
-//                     //   backgroundColor: isMatched(data, ledgerData)
-//                     //     ? "#d1ffd1"
-//                     //     : "#ffd1d1", // Green for matched, red for unmatched
-//                     // }}
 //                   >
 //                     <td>
 //                       <input type="checkbox" />
@@ -375,16 +361,14 @@
 //                     <td>{data.Debit}</td>
 //                     <td>{data.USID}</td>
 //                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           ) : (
-//             <p>No ledger data available.</p>
-//           )}
+//                 )
+//               )}
+//             </tbody>
+//           </table>
 //         </div>
 
-//         {/* Statement Section */}
-//         <div style={{ flexBasis: "50%", marginLeft: "50px" }}>
+//         {/* Statement Data Table */}
+//         <Grid item lg={6} md={6} sm={12} xs={12}>
 //           <div
 //             style={{
 //               margin: "20px 0", // reduce top/bottom margin
@@ -397,7 +381,6 @@
 //             <div>
 //               <h5>Statement</h5>
 //             </div>
-
 //             <div
 //               style={{
 //                 display: "flex",
@@ -410,11 +393,8 @@
 //               }}
 //             >
 //               <h5 style={{ margin: "0 10px" }}>Page 1 of 1</h5>
-//               <h5 style={{ margin: "0 10px" }}>
-//                 0 of {statementData.length} Records Matched
-//               </h5>
+//               <h5 style={{ margin: "0 10px" }}>0 of 38 Records</h5>
 //             </div>
-
 //             <div
 //               style={{
 //                 borderRadius: "30px",
@@ -423,76 +403,46 @@
 //                 color: "white",
 //               }}
 //             >
-//               <p style={{ margin: 0 }}>{statementData.length} item(s)</p>
+//               <p style={{ margin: 0 }}>369 item(s)</p>
 //             </div>
 //           </div>
-
-//           {loading ? (
-//             <p>Loading statement...</p>
-//           ) : statementData.length > 0 ? (
-//             <table>
-//               <thead>
-//                 <tr>
-//                   <th></th>
-//                   <th></th>
-//                   <th>Date</th>
-//                   <th>Details</th>
-//                   <th>Amount</th>
-//                   <th>UID</th>
+//           <table>
+//             <tbody>
+//               {(dateFilter === "allMatched"
+//                 ? matchedStatements
+//                 : statementData
+//               ).map((data, index) => (
+//                 <tr
+//                   key={index}
+//                   style={{
+//                     backgroundColor:
+//                       dateFilter === "allMatched" &&
+//                       isMatched(data, "statement", "exact")
+//                         ? "lightblue"
+//                         : "white",
+//                   }}
+//                 >
+//                   <td>
+//                     <input type="checkbox" />
+//                   </td>
+//                   <td>
+//                     <EditIcon /> {/* Edit icon */}
+//                   </td>
+//                   <td>{data.PostDate}</td>
+//                   <td>{data.Details}</td>
+//                   <td>{data.Credit}</td>
+//                   <td>{data.USID}</td>
 //                 </tr>
-//               </thead>
-//               <tbody>
-//                 {statementData.map((data, index) => (
-//                   <tr
-//                     key={index}
-//                     style={{
-//                       // backgroundColor: isMatched(data, "statement")
-//                       //   ? "#d1ffd1"
-//                       //   : "#ffd1d1", // Green for matched, red for unmatched
-//                       backgroundColor:
-//                         dateFilter === "allMatched" &&
-//                         isMatched(data, "ledger", "exact")
-//                           ? "lightblue" // Blue background for matched items
-//                           : "white", // White for unmatched
-//                     }}
-//                     // style={{
-//                     //   backgroundColor: isMatched(data, statementData)
-//                     //     ? "#d1ffd1"
-//                     //     : "#ffd1d1", // Green for matched, red for unmatched
-//                     // }}
-//                   >
-//                     <td>
-//                       <input type="checkbox" />
-//                     </td>
-//                     <td>
-//                       <EditIcon /> {/* Edit icon */}
-//                     </td>
-//                     <td>{data.PostDate}</td>
-//                     <td>{data.Details}</td>
-//                     <td>{data.Credit}</td>
-//                     <td>{data.USID}</td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           ) : (
-//             <p>No statement data available.</p>
-//           )}
-
-//           {loading ? (
-//             <p>Loading ledger...</p>
-//           ) : (
-//             filteredItems.map((item) => (
-//               // Render each item in filteredItems
-//               <div key={item.id}>{item.details}</div>
-//             ))
-//           )}
-//         </div>
+//               ))}
+//             </tbody>
+//           </table>
+//         </Grid>
 //       </div>
 //     </>
 //   );
 // };
 
+// export default ParentMapped;
 // export default ParentMapped;
 import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
@@ -610,6 +560,15 @@ const ParentMapped = () => {
           // Exact match logic
           return item.Debit === match.Credit && item.USID === match.USID;
         }
+        if (matchType === "similar") {
+          // Exact match logic
+          return (
+            item.Debit === match.Credit &&
+            item.USID === match.USID &&
+            item.PostDate === match.PostDate &&
+            item.Details === match.Details
+          );
+        }
       }
       if (type === "statement") {
         if (matchType === "probable") {
@@ -621,84 +580,37 @@ const ParentMapped = () => {
           return item.Credit === match.Debit && item.USID === match.USID;
         }
       }
+      if (type === "ledger" || type === "statement") {
+        if (matchType === "manyToOne") {
+          // Many-to-One match logic
+          const relevantMatches = matchedItems.filter(
+            (match) => match.USID === item.USID
+          );
+
+          if (type === "ledger") {
+            const totalDebit = relevantMatches.reduce(
+              (sum, match) => sum + match.Debit,
+              0
+            );
+            return totalDebit === item.Credit;
+          }
+
+          if (type === "statement") {
+            const totalCredit = relevantMatches.reduce(
+              (sum, match) => sum + match.Credit,
+              0
+            );
+            return totalCredit === item.Debit;
+          }
+        }
+      }
       return false;
     });
   };
 
-  // useEffect(() => {
-  //   console.log("Matched items:", matchedItems);
-  // }, [matchedItems]);
-  // const isMatched = (ledgerItem, statementData) => {
-  //   // Ensure statementData is an array
-  //   if (!Array.isArray(statementData)) {
-  //     console.warn("statementData is not an array:", statementData);
-  //     return false;
-  //   }
-
-  //   // Compare the Debit from ledgerData with the Credit from statementData
-  //   return statementData.some(
-  //     (statementItem) =>
-  //       ledgerItem.Debit === statementItem.Credit &&
-  //       ledgerItem.USID === statementItem.USID
-  //   );
-  // };
-  // const isMatched = (ledgerItem, statementData) => {
-  //   if (!Array.isArray(statementData)) {
-  //     console.warn("statementData is not an array:", statementData);
-  //     return false;
-  //   }
-
-  //   return statementData.some(
-  //     (statementItem) =>
-  //       ledgerItem.Debit === statementItem.Credit &&
-  //       ledgerItem.USID === statementItem.USID // Ensure you're comparing the correct fields
-  //   );
-  // };
   const handleDateFilterChange = (event) => {
     setDateFilter(event.target.value);
   };
-
-  // useEffect(() => {
-  //   const fetchMatchedItems = async () => {
-  //     if (!currentSession) return;
-
-  //     const switchId = currentSession._id;
-  //     const token = localStorage.getItem("jwtToken");
-
-  //     if (!token) {
-  //       setError("Authentication token missing. Please log in again.");
-  //       return;
-  //     }
-
-  //     try {
-  //       const response = await axios.get(
-  //         `${apiUrl}/api/matches/${switchId}?type=${dateFilter}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //         }
-  //       );
-
-  //       if (response.data.success) {
-  //         const data = response.data.data;
-  //         // Ensure data is an array
-  //         if (data?.exactMatches && Array.isArray(data.exactMatches)) {
-  //           setMatchedItems(data.exactMatches);
-  //         } else {
-  //           console.warn("Expected an array, but received:", data);
-  //           setMatchedItems([]); // Reset to empty array if not an array
-  //         }
-
-  //         console.log("Fetched matched items:", data);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching matched items:", error);
-  //     }
-  //   };
-
-  //   fetchMatchedItems();
-  // }, [currentSession, dateFilter, apiUrl]);
 
   useEffect(() => {
     const fetchMatchedItems = async () => {
@@ -754,30 +666,6 @@ const ParentMapped = () => {
 
     fetchMatchedItems();
   }, [currentSession, dateFilter, apiUrl]);
-
-  // const filteredItems = matchedItems.filter((item) => {
-  //   switch (dateFilter) {
-  //     case "unmatched":
-  //       return item.status === "unmatched";
-  //     case "allMatched":
-  //       return item.status === "matched";
-  //     case "probable":
-  //       return item.status === "probable";
-  //     case "reversal":
-  //       return item.status === "reversal";
-  //     case "manualMatched":
-  //       return item.matchType === "manual";
-  //     case "autoMatched":
-  //       return item.matchType === "auto";
-  //     case "partiallyMatched":
-  //       return item.status === "partiallyMatched";
-  //     case "partiallyReversed":
-  //       return item.status === "partiallyReversed";
-  //     case "allItems":
-  //     default:
-  //       return true; // Return all items if no specific filter is selected
-  //   }
-  // });
 
   const filteredItems = Array.isArray(matchedItems)
     ? matchedItems.filter((item) => {
@@ -851,7 +739,7 @@ const ParentMapped = () => {
             <div>
               <h5>Ledger</h5>
             </div>
-            <div
+            {/* <div
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -864,7 +752,7 @@ const ParentMapped = () => {
             >
               <h5 style={{ margin: "0 10px" }}>Page 1 of 1</h5>
               <h5 style={{ margin: "0 10px" }}>0 of 38 Records</h5>
-            </div>
+            </div> */}
             <div
               style={{
                 borderRadius: "30px",
@@ -873,7 +761,11 @@ const ParentMapped = () => {
                 color: "white",
               }}
             >
-              <p style={{ margin: 0 }}>369 item(s)</p>
+              <p style={{ margin: 0 }}>
+                {ledgerData.length > 1 || ledgerData.length === 0
+                  ? `${ledgerData.length} items`
+                  : `${ledgerData.length} item`}
+              </p>
             </div>
           </div>
 
@@ -922,20 +814,7 @@ const ParentMapped = () => {
             <div>
               <h5>Statement</h5>
             </div>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                borderRadius: "30px", // reduced radius
-                backgroundColor: "#666666",
-                padding: "5px 15px", // smaller padding
-                color: "white",
-              }}
-            >
-              <h5 style={{ margin: "0 10px" }}>Page 1 of 1</h5>
-              <h5 style={{ margin: "0 10px" }}>0 of 38 Records</h5>
-            </div>
+
             <div
               style={{
                 borderRadius: "30px",
@@ -944,7 +823,11 @@ const ParentMapped = () => {
                 color: "white",
               }}
             >
-              <p style={{ margin: 0 }}>369 item(s)</p>
+              <p style={{ margin: 0 }}>
+                {statementData.length > 1 || statementData.length === 0
+                  ? `${statementData.length} items`
+                  : `${statementData.length} item`}
+              </p>
             </div>
           </div>
           <table>

@@ -78,6 +78,7 @@ import CreateDomain from "./pages/CreateDomain";
 
 import StatementSummary from "./StatementSummary";
 import LedgerSummary from "./LedgerSummary";
+import UnmatchedItems from "./import/UnmatchedTable";
 // import SwitchAccount from 'app/components/MatxLayout/Layout1/SwitchAccount'
 
 const Analytics = Loadable(lazy(() => import("./Analytics")));
@@ -149,6 +150,7 @@ const dashboardRoutes = [
 
   // { path: '/dashboard', element: <SwitchAccount /> },
   { path: "/dashboard/default", element: <Cover /> },
+  { path: "/dashboard/unmatched-item", element: <UnmatchedItems /> },
   { path: "/dashboard/content", element: <Content /> },
   { path: "/dashboard/director-report", element: <DirectorsReport /> },
   { path: "/dashboard/certification", element: <Certification /> },
