@@ -641,7 +641,7 @@ const ParentMapped = () => {
             setExactMatches(data.exactMatches); // Ledger matches
           } else {
             console.warn(
-              "Expected an array for exactMatches, but received:",
+              "Expected an array for exactMatches, but this is what i received:",
               data.exactMatches
             );
             setExactMatches([]);
