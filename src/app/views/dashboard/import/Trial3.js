@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@mui/material";
 import ExcelToJson from "./ExcelToJson";
+import CircularProgress from "@mui/material/CircularProgress";
+import { Box } from "@mui/system";
 import UnMappedData from "./UnmappedData";
 import { SessionContext } from "app/components/MatxLayout/SwitchContext";
 
@@ -176,6 +178,7 @@ const Trial3 = () => {
   const [file, setFile] = useState(null); // Add state for the file
   const [accountTitle, setAccountTitle] = useState("");
   const [balanceAsPerLedger, setBalanceAsPerLedger] = useState("0.0"); // Add state for balance
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const { currentSession } = useContext(SessionContext);
   console.log("Session passed to Trial3:", currentSession); // Add this log
@@ -186,6 +189,7 @@ const Trial3 = () => {
       if (file) {
         setData([]);
         setCategorizedData([]);
+        setLoading(true);
         const formData = new FormData();
         formData.append("csvFile", file);
         formData.append("switch", currentSession._id);
@@ -208,6 +212,8 @@ const Trial3 = () => {
       }
     } catch (err) {
       console.error("Error uploading data:", err);
+    } finally {
+      setLoading(false); // Hide spinner
     }
   };
 
@@ -253,6 +259,24 @@ const Trial3 = () => {
   const headers = ["PostDate", "ValDate", "Details", "Debit", "Credit", "USID"]; // Define headers array
   return (
     <main>
+      {loading && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            zIndex: 9999,
+          }}
+        >
+          <CircularProgress size={60} />
+        </Box>
+      )}
       {!isNext && (
         <section style={{ marginTop: "50px" }}>
           <h2

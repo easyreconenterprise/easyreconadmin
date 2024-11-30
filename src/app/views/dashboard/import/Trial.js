@@ -217,9 +217,11 @@
 
 import React, { useState, useEffect, useContext } from "react";
 import { Button } from "@mui/material";
+import { Box } from "@mui/system";
 import axios from "axios";
 import UnMappedData from "./UnmappedData";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 import ExcelToJson from "./ExcelToJson";
 import Statement from "../Statement";
 import ExcelToStatement from "./ExceltoStatement";
@@ -235,6 +237,7 @@ const Trial = () => {
   const [accountTitle, setAccountTitle] = useState("");
   const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("0.0"); // Add state for balance
   const { currentSession } = useContext(SessionContext);
+  const [loading, setLoading] = useState(false); // Add loading state
   console.log("Current session before uploading:", currentSession);
 
   const handleDataChange = (jsonData) => {
@@ -253,6 +256,7 @@ const Trial = () => {
       if (file) {
         setData([]);
         setCategorizedData([]);
+        setLoading(true);
         const formData = new FormData();
         formData.append("stmFile", file); // Ensure this matches the backend field name
         formData.append("switch", currentSession._id); // Ensure this is correctly included
@@ -280,6 +284,8 @@ const Trial = () => {
       }
     } catch (err) {
       console.error("Error uploading data:", err);
+    } finally {
+      setLoading(false); // Hide spinner
     }
   };
   useEffect(() => {
@@ -320,6 +326,24 @@ const Trial = () => {
   );
   return (
     <main>
+      {loading && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            zIndex: 9999,
+          }}
+        >
+          <CircularProgress size={60} />
+        </Box>
+      )}
       {!isNext && (
         <section style={{ marginTop: "50px" }}>
           <b>

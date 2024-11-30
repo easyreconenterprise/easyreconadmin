@@ -955,7 +955,7 @@ const AtmMatching = () => {
     exactMatch: false,
     probableMatch: false,
     similarDetails: false,
-    manyToMany: false,
+    manyToOne: false,
     userDefined: false,
   });
   const { currentSession } = useContext(SessionContext);
@@ -974,12 +974,96 @@ const AtmMatching = () => {
     setStates({ ...states, [name]: event.target.checked });
   };
 
+  // const handleMatch = async () => {
+  //   const matched = [];
+  //   const matchedStatements = []; // Array to hold matched statement items
+  //   const probableMatched = [];
+  //   const similarDetailsMatched = [];
+
+  //   ledgerData.forEach((ledgerItem) => {
+  //     statementData.forEach((statementItem) => {
+  //       if (
+  //         states.exactMatch &&
+  //         isMatched(ledgerItem, statementItem, "exact")
+  //       ) {
+  //         matched.push(ledgerItem);
+  //         matchedStatements.push(statementItem); // Push the matched statement item
+  //       }
+  //       if (
+  //         states.probableMatch &&
+  //         isMatched(ledgerItem, statementItem, "probable")
+  //       ) {
+  //         probableMatched.push(ledgerItem);
+  //         matchedStatements.push(statementItem); // Push the matched statement item for probable matches
+  //       }
+  //       if (
+  //         states.similarDetails &&
+  //         isMatched(ledgerItem, statementItem, "similar")
+  //       )
+  //         console.log("Similar Match Found:", ledgerItem);
+  //       {
+  //         similarDetailsMatched.push(ledgerItem);
+  //         matchedStatements.push(statementItem); // Push the matched statement item for similar details matches
+  //       }
+  //     });
+  //   });
+
+  //   // Set matched items based on selected checkboxes
+  //   setMatchedItems({
+  //     exact: matched,
+  //     probable: probableMatched,
+  //     similar: similarDetailsMatched,
+  //     matchedStatements: matchedStatements, // Store matched statements too
+  //   });
+  //   setOpen(true);
+  // };
+
   const handleMatch = async () => {
     const matched = [];
     const matchedStatements = []; // Array to hold matched statement items
     const probableMatched = [];
+    const manyToOneMatched = [];
     const similarDetailsMatched = [];
 
+    const manyToOneMatch = (ledger, statement) => {
+      statement.forEach((statementItem) => {
+        // Parse Credit of the statement item as a number
+        const statementCredit = parseFloat(statementItem.Credit);
+
+        // Find all ledger items with the same USID
+        const relevantLedgerItems = ledger.filter(
+          (ledgerItem) => ledgerItem.USID === statementItem.USID
+        );
+
+        // Calculate the total Debit for these ledger items, converting Debit to a number
+        const totalDebit = relevantLedgerItems.reduce((sum, ledgerItem) => {
+          return sum + parseFloat(ledgerItem.Debit || 0);
+        }, 0);
+
+        // Fix decimal precision issues by rounding to two decimal places
+        const roundedTotalDebit = parseFloat(totalDebit.toFixed(2));
+        const roundedStatementCredit = parseFloat(statementCredit.toFixed(2));
+        console.log(`roundedTotalDebit: ${roundedTotalDebit}`);
+        console.log(`roundedStatementCredit: ${roundedStatementCredit}`);
+
+        // Check if the rounded total Debit equals the rounded Credit of the statement item
+        // this prevents exact matches from being included in many-to-one matches
+        if (
+          roundedTotalDebit === roundedStatementCredit &&
+          relevantLedgerItems.length > 1
+        ) {
+          // matches.push({
+          //   statement: statementItem,
+          //   matchingLedger: relevantLedgerItems,
+          // });
+          manyToOneMatched.push(...relevantLedgerItems);
+        }
+      });
+    };
+
+    if (states.manyToOne) {
+      manyToOneMatch(ledgerData, statementData);
+    }
     ledgerData.forEach((ledgerItem) => {
       statementData.forEach((statementItem) => {
         if (
@@ -987,36 +1071,35 @@ const AtmMatching = () => {
           isMatched(ledgerItem, statementItem, "exact")
         ) {
           matched.push(ledgerItem);
-          matchedStatements.push(statementItem); // Push the matched statement item
+          matchedStatements.push(statementItem);
         }
         if (
           states.probableMatch &&
           isMatched(ledgerItem, statementItem, "probable")
         ) {
           probableMatched.push(ledgerItem);
-          matchedStatements.push(statementItem); // Push the matched statement item for probable matches
+          matchedStatements.push(statementItem);
         }
         if (
           states.similarDetails &&
           isMatched(ledgerItem, statementItem, "similar")
-        )
-          console.log("Similar Match Found:", ledgerItem);
-        {
+        ) {
           similarDetailsMatched.push(ledgerItem);
-          matchedStatements.push(statementItem); // Push the matched statement item for similar details matches
+          matchedStatements.push(statementItem);
         }
       });
     });
 
-    // Set matched items based on selected checkboxes
     setMatchedItems({
       exact: matched,
       probable: probableMatched,
+      manyToOne: manyToOneMatched,
       similar: similarDetailsMatched,
-      matchedStatements: matchedStatements, // Store matched statements too
+      matchedStatements,
     });
     setOpen(true);
   };
+
   useEffect(() => {
     console.log("Updated Matched Items:", matchedItems);
   }, [matchedItems]); // This will log when matchedItems is updated
@@ -1078,21 +1161,35 @@ const AtmMatching = () => {
       );
     }
     if (matchType === "similar") {
-      // Similar details match logic: checks USID, amount, post date, and details
+      // Similar details match logic
       return (
         ledgerItem.USID === statementItem.USID &&
         ledgerItem.Debit === statementItem.Credit &&
         ledgerItem.PostDate === statementItem.PostDate &&
-        ledgerItem.Details === statementItem.Details
+        ledgerItem.Details.trim().toLowerCase() ===
+          statementItem.Details.trim().toLowerCase()
       );
     }
     if (matchType === "probable") {
-      // Check if USID matches
-      if (ledgerItem.USID === statementItem.USID) {
-        return true;
-      }
-      // If USID doesn't match, check if amounts match
-      return ledgerItem.Debit === statementItem.Credit;
+      // Probable match logic
+      return (
+        ledgerItem.USID === statementItem.USID ||
+        ledgerItem.Debit === statementItem.Credit
+      );
+    }
+    if (matchType === "manyToOne") {
+      // Filter ledger items that share the same USID as the statement item
+      const relevantLedgerItems = ledgerData.filter(
+        (item) => item.USID === statementItem.USID
+      );
+
+      // Calculate the total debit for the matching ledger items
+      const totalDebit = relevantLedgerItems.reduce(
+        (sum, item) => sum + item.Debit,
+        0
+      );
+      // Check if the total debit equals the credit of the statement item
+      return totalDebit === statementItem.Credit;
     }
     return false;
   };
@@ -1146,11 +1243,11 @@ const AtmMatching = () => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    checked={states.manyToMany}
-                    onChange={handleChange("manyToMany")}
+                    checked={states.manyToOne}
+                    onChange={handleChange("manyToOne")}
                   />
                 }
-                label="Many to Many Matches"
+                label="Many to One Matches"
               />
               <br></br>
               <FormControlLabel
@@ -1213,6 +1310,17 @@ const AtmMatching = () => {
                     Similar Details Match Items: {matchedItems.similar.length}
                   </h3>
                   {/* Render similar match items here */}
+                </div>
+              )}
+
+            {matchedItems &&
+              matchedItems.manyToOne &&
+              matchedItems.manyToOne.length > 0 && (
+                <div>
+                  <h3>
+                    Many-to-One Match Items: {matchedItems.manyToOne.length}
+                  </h3>
+                  {/* Render probable match items here */}
                 </div>
               )}
 
