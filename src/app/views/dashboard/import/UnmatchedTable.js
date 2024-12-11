@@ -69,13 +69,14 @@ const UnmatchedItems = () => {
   const [loading, setLoading] = useState(true);
   const { currentSession } = useContext(SessionContext);
   const [error, setError] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchUnmatchedItems = async () => {
       const switchId = currentSession._id;
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/matches/${switchId}?type=unmatched`
+          `${apiUrl}/api/matches/${switchId}?type=unmatched`
         );
         const allItems = response.data.data;
 

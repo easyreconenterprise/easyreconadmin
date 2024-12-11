@@ -499,7 +499,7 @@ const LedgerSummary = () => {
   const [statementData, setStatementData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const apiUrl = process.env.REACT_APP_API_URL;
   useEffect(() => {
     if (currentSession) {
       const accountId = currentSession.account;
@@ -513,7 +513,7 @@ const LedgerSummary = () => {
 
       // Fetch account details
       axios
-        .get(`http://localhost:7000/api/account/${accountId}`, {
+        .get(`${apiUrl}/api/account/${accountId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -527,7 +527,7 @@ const LedgerSummary = () => {
 
       // Fetch statement data using the switch ID
       axios
-        .get(`http://localhost:7000/api/ledger/${switchId}`, {
+        .get(`${apiUrl}/api/ledger/${switchId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -122,6 +122,7 @@ const SessionInfo = () => {
   const { logout, user } = useAuth();
   const [domainName, setDomainName] = useState("N/A");
   const [accountTitle, setAccountTitle] = useState("N/A");
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     console.log("Current session:", currentSession); // Log the current session
@@ -136,7 +137,7 @@ const SessionInfo = () => {
   const fetchAffiliateName = async (affiliateId) => {
     console.log("Fetching affiliate name for ID:", affiliateId); // Add this line for debugging
     try {
-      const response = await axios.get("http://localhost:7000/api/affiliates");
+      const response = await axios.get(`${apiUrl}/api/affiliates`);
       console.log("Affiliate API response:", response.data); // Log the response
       const affiliate = response.data.find((item) => item._id === affiliateId);
       console.log("Found affiliate:", affiliate); // Add this line to check the found affiliate
@@ -156,9 +157,7 @@ const SessionInfo = () => {
       domainId
     ); // Debugging log
     try {
-      const response = await axios.get(
-        `http://localhost:7000/api/domains/${affiliateId}`
-      );
+      const response = await axios.get(`${apiUrl}/api/domains/${affiliateId}`);
       console.log("Domain API response:", response.data); // Log the response
       const domain = response.data.find((item) => item._id === domainId);
       console.log("Found domain:", domain); // Check the found domain
@@ -176,9 +175,7 @@ const SessionInfo = () => {
       accountId
     ); // Debugging log
     try {
-      const response = await axios.get(
-        `http://localhost:7000/api/accounts/${domainId}`
-      );
+      const response = await axios.get(`${apiUrl}/api/accounts/${domainId}`);
       console.log("Account API response:", response.data); // Log the response
       const account = response.data.find((item) => item._id === accountId);
       console.log("Found account:", account); // Check the found account

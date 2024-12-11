@@ -516,7 +516,7 @@ const StatementSummary = () => {
 
       // Fetch account details
       axios
-        .get(`http://localhost:7000/api/account/${accountId}`, {
+        .get(`${apiUrl}/api/account/${accountId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -530,7 +530,7 @@ const StatementSummary = () => {
 
       // Fetch statement data using the switch ID
       axios
-        .get(`http://localhost:7000/api/statements/${switchId}`, {
+        .get(`${apiUrl}/api/statements/${switchId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
