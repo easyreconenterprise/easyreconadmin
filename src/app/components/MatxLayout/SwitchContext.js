@@ -64,11 +64,11 @@ export const SessionContext = createContext();
 export const SessionProvider = ({ children }) => {
   const [sessions, setSessions] = useState([]);
   const [currentSession, setCurrentSession] = useState(null);
-
+const apiUrl = process.env.REACT_APP_API_URL
   // Fetch sessions and restore the last session on mount
   useEffect(() => {
     axios
-      .get("http://localhost:7000/api/switch-session")
+      .get(`${apiUrl}/api/switch-session`)
       .then((response) => {
         setSessions(response.data);
 
@@ -106,7 +106,7 @@ export const SessionProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:7000/api/switch-session",
+       `${apiUrl}/api/switch-session`,
         newSessionData,
         {
           headers: {
