@@ -1166,8 +1166,7 @@ const AtmMatching = () => {
         ledgerItem.USID === statementItem.USID &&
         ledgerItem.Debit === statementItem.Credit &&
         ledgerItem.PostDate === statementItem.PostDate &&
-        ledgerItem.Details.trim().toLowerCase() ===
-          statementItem.Details.trim().toLowerCase()
+        ledgerItem.Details === statementItem.Details
       );
     }
     if (matchType === "probable") {
