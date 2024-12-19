@@ -246,6 +246,9 @@ const Cover = () => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+            params: {
+              switchSessionId: currentSession?._id, // Pass the current session ID
+            },
           }
         );
 
@@ -253,6 +256,9 @@ const Cover = () => {
         const ledgerResponse = await axios.get(`${apiUrl}/api/lastledger`, {
           headers: {
             Authorization: `Bearer ${token}`,
+          },
+          params: {
+            switchSessionId: currentSession?._id, // Pass the current session ID
           },
         });
 
