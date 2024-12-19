@@ -234,10 +234,79 @@ const Cover = () => {
       fetchAccountData();
     }
   }, [currentSession]);
+  // useEffect(() => {
+  //   const fetchLastUploadedDates = async () => {
+  //     try {
+  //       const token = localStorage.getItem("jwtToken");
+
+  //       // Fetch the last statement date
+  //       const statementResponse = await axios.get(
+  //         `${apiUrl}/api/laststatement`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           params: {
+  //             switchSessionId: currentSession?._id, // Pass the current session ID
+  //           },
+  //         }
+  //       );
+
+  //       // Fetch the last ledger date
+  //       const ledgerResponse = await axios.get(`${apiUrl}/api/lastledger`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         params: {
+  //           switchSessionId: currentSession?._id, // Pass the current session ID
+  //         },
+  //       });
+
+  //       // Extract uploadedAt dates
+  //       const lastStatementUploadedAt = statementResponse.data.uploadedAt;
+  //       const lastLedgerUploadedAt = ledgerResponse.data.uploadedAt;
+
+  //       // Format and set the dates in state
+  //       setLastStatementDate(
+  //         lastStatementUploadedAt
+  //           ? new Date(lastStatementUploadedAt).toLocaleDateString("en-GB", {
+  //               day: "2-digit",
+  //               month: "short",
+  //               year: "numeric",
+  //             })
+  //           : "N/A"
+  //       );
+
+  //       setLastLedgerDate(
+  //         lastLedgerUploadedAt
+  //           ? new Date(lastLedgerUploadedAt).toLocaleDateString("en-GB", {
+  //               day: "2-digit",
+  //               month: "short",
+  //               year: "numeric",
+  //             })
+  //           : "N/A"
+  //       );
+
+  //       console.log("Last statement uploaded at:", lastStatementUploadedAt);
+  //       console.log("Last ledger uploaded at:", lastLedgerUploadedAt);
+  //     } catch (error) {
+  //       console.error("Error fetching last uploaded dates:", error);
+  //     }
+  //   };
+
+  //   fetchLastUploadedDates();
+  // }, []);
   useEffect(() => {
     const fetchLastUploadedDates = async () => {
       try {
         const token = localStorage.getItem("jwtToken");
+
+        if (!currentSession?._id) {
+          console.warn("No current session ID available.");
+          setLastStatementDate("N/A");
+          setLastLedgerDate("N/A");
+          return;
+        }
 
         // Fetch the last statement date
         const statementResponse = await axios.get(
@@ -247,7 +316,7 @@ const Cover = () => {
               Authorization: `Bearer ${token}`,
             },
             params: {
-              switchSessionId: currentSession?._id, // Pass the current session ID
+              switchSessionId: currentSession._id, // Pass the current session ID
             },
           }
         );
@@ -258,7 +327,7 @@ const Cover = () => {
             Authorization: `Bearer ${token}`,
           },
           params: {
-            switchSessionId: currentSession?._id, // Pass the current session ID
+            switchSessionId: currentSession._id, // Pass the current session ID
           },
         });
 
@@ -295,7 +364,7 @@ const Cover = () => {
     };
 
     fetchLastUploadedDates();
-  }, []);
+  }, [currentSession]); // Add currentSession as a dependency
 
   return (
     <div>
