@@ -49,38 +49,6 @@ const Card = styled("div")(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const subscribarList = [
-  {
-    accountInfo: "Total No of Record(Ledger)",
-    count: "18",
-    value: "231,332.52",
-  },
-  {
-    accountInfo: "Total Record Matched(Ledger)",
-    count: "10 ",
-    value: "231,332.52",
-  },
-  {
-    accountInfo: "Total outstanding record(Ledger)",
-    count: "8 ",
-    value: "231,332.52",
-  },
-  {
-    accountInfo: "Total No of Record(Stmt)",
-    count: "1",
-    value: "231,332.52",
-  },
-  {
-    accountInfo: "Total Record Matched(Stmt)",
-    count: "1",
-    value: "231,332.52",
-  },
-  {
-    accountInfo: "Total outstanding record(Ledger)",
-    count: "21",
-    value: "231,332.52",
-  },
-];
 Chart.register(LinearScale, BarElement, CategoryScale, ArcElement);
 
 const Cover = () => {
@@ -89,16 +57,52 @@ const Cover = () => {
     useContext(SessionContext);
   const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("0.0");
   const [balanceAsPerLedger, setBalanceAsPerLedger] = useState("0.0");
+  const [ledgerRecordCount, setLedgerRecordCount] = useState(0);
+  const [ledgerTotalValue, setLedgerTotalValue] = useState("0.0");
+
   const [balanceAsPerLedgerDate, setBalanceAsPerLedgerDate] = useState("0.0");
   const [balanceAsPerStatementDate, setBalanceAsPerStatementDate] =
     useState("0.0");
   const [lastLedgerDate, setLastLedgerDate] = useState(null);
   const [lastStatementDate, setLastStatementDate] = useState(null);
 
+  const [statementRecordCount, setStatementRecordCount] = useState(0);
+
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
   const apiUrl = process.env.REACT_APP_API_URL;
-
+  const subscribarList = [
+    {
+      accountInfo: "Total No of Record(Ledger)",
+      count: ledgerRecordCount.toString(),
+      value: balanceAsPerLedger,
+    },
+    {
+      accountInfo: "Total Record Matched(Ledger)",
+      count: "10 ",
+      value: "231,332.52",
+    },
+    {
+      accountInfo: "Total outstanding record(Ledger)",
+      count: "8 ",
+      value: "231,332.52",
+    },
+    {
+      accountInfo: "Total No of Record(Stmt)",
+      count: statementRecordCount.toString(),
+      value: balanceAsPerStmt,
+    },
+    {
+      accountInfo: "Total Record Matched(Stmt)",
+      count: "1",
+      value: "231,332.52",
+    },
+    {
+      accountInfo: "Total outstanding record(Ledger)",
+      count: "21",
+      value: "231,332.52",
+    },
+  ];
   useEffect(() => {
     // Check local storage for 'lastSession' on component mount
     const savedSession = localStorage.getItem("lastSession");
@@ -234,137 +238,7 @@ const Cover = () => {
       fetchAccountData();
     }
   }, [currentSession]);
-  // useEffect(() => {
-  //   const fetchLastUploadedDates = async () => {
-  //     try {
-  //       const token = localStorage.getItem("jwtToken");
 
-  //       // Fetch the last statement date
-  //       const statementResponse = await axios.get(
-  //         `${apiUrl}/api/laststatement`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //           params: {
-  //             switchSessionId: currentSession?._id, // Pass the current session ID
-  //           },
-  //         }
-  //       );
-
-  //       // Fetch the last ledger date
-  //       const ledgerResponse = await axios.get(`${apiUrl}/api/lastledger`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         params: {
-  //           switchSessionId: currentSession?._id, // Pass the current session ID
-  //         },
-  //       });
-
-  //       // Extract uploadedAt dates
-  //       const lastStatementUploadedAt = statementResponse.data.uploadedAt;
-  //       const lastLedgerUploadedAt = ledgerResponse.data.uploadedAt;
-
-  //       // Format and set the dates in state
-  //       setLastStatementDate(
-  //         lastStatementUploadedAt
-  //           ? new Date(lastStatementUploadedAt).toLocaleDateString("en-GB", {
-  //               day: "2-digit",
-  //               month: "short",
-  //               year: "numeric",
-  //             })
-  //           : "N/A"
-  //       );
-
-  //       setLastLedgerDate(
-  //         lastLedgerUploadedAt
-  //           ? new Date(lastLedgerUploadedAt).toLocaleDateString("en-GB", {
-  //               day: "2-digit",
-  //               month: "short",
-  //               year: "numeric",
-  //             })
-  //           : "N/A"
-  //       );
-
-  //       console.log("Last statement uploaded at:", lastStatementUploadedAt);
-  //       console.log("Last ledger uploaded at:", lastLedgerUploadedAt);
-  //     } catch (error) {
-  //       console.error("Error fetching last uploaded dates:", error);
-  //     }
-  //   };
-
-  //   fetchLastUploadedDates();
-  // }, []);
-  // useEffect(() => {
-  //   const fetchLastUploadedDates = async () => {
-  //     try {
-  //       const token = localStorage.getItem("jwtToken");
-
-  //       if (!currentSession?._id) {
-  //         console.warn("No current session ID available.");
-  //         setLastStatementDate("N/A");
-  //         setLastLedgerDate("N/A");
-  //         return;
-  //       }
-
-  //       // Fetch the last statement date
-  //       const statementResponse = await axios.get(
-  //         `${apiUrl}/api/laststatement`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //           params: {
-  //             switchSessionId: currentSession._id, // Pass the current session ID
-  //           },
-  //         }
-  //       );
-
-  //       // Fetch the last ledger date
-  //       const ledgerResponse = await axios.get(`${apiUrl}/api/lastledger`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         params: {
-  //           switchSessionId: currentSession._id, // Pass the current session ID
-  //         },
-  //       });
-
-  //       // Extract uploadedAt dates
-  //       const lastStatementUploadedAt = statementResponse.data.uploadedAt;
-  //       const lastLedgerUploadedAt = ledgerResponse.data.uploadedAt;
-
-  //       // Format and set the dates in state
-  //       setLastStatementDate(
-  //         lastStatementUploadedAt
-  //           ? new Date(lastStatementUploadedAt).toLocaleDateString("en-GB", {
-  //               day: "2-digit",
-  //               month: "short",
-  //               year: "numeric",
-  //             })
-  //           : "N/A"
-  //       );
-
-  //       setLastLedgerDate(
-  //         lastLedgerUploadedAt
-  //           ? new Date(lastLedgerUploadedAt).toLocaleDateString("en-GB", {
-  //               day: "2-digit",
-  //               month: "short",
-  //               year: "numeric",
-  //             })
-  //           : "N/A"
-  //       );
-
-  //       console.log("Last statement uploaded at:", lastStatementUploadedAt);
-  //       console.log("Last ledger uploaded at:", lastLedgerUploadedAt);
-  //     } catch (error) {
-  //       console.error("Error fetching last uploaded dates:", error);
-  //     }
-  //   };
-
-  //   fetchLastUploadedDates();
-  // }, [currentSession]); // Add currentSession as a dependency
   useEffect(() => {
     const fetchLastUploadedDates = async () => {
       try {
@@ -439,6 +313,78 @@ const Cover = () => {
     // Fetch dates whenever currentSession changes
     fetchLastUploadedDates();
   }, [currentSession]); // Add currentSession as a dependency
+
+  useEffect(() => {
+    const fetchLedgerData = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!currentSession?._id) return;
+
+        const response = await axios.get(
+          `${apiUrl}/api/ledger/${currentSession._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const ledgerRecords = response.data || [];
+        const totalDebit = ledgerRecords.reduce(
+          (sum, record) => sum + parseFloat(record.Debit || 0),
+          0
+        ); // Summing up `Debit` values
+
+        const totalCredit = ledgerRecords.reduce(
+          (sum, record) => sum + parseFloat(record.Credit || 0),
+          0
+        ); // Summing up `Credit` values
+
+        setLedgerRecordCount(ledgerRecords.length);
+        // setLedgerTotalValue((totalDebit - totalCredit).toFixed(2)); // Net total
+      } catch (error) {
+        console.error("Error fetching ledger data:", error);
+      }
+    };
+
+    fetchLedgerData();
+  }, [currentSession]);
+
+  useEffect(() => {
+    const fetchStatementData = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!currentSession?._id) return;
+
+        const response = await axios.get(
+          `${apiUrl}/api/statements/${currentSession._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const statementRecords = response.data || [];
+        const totalDebit = statementRecords.reduce(
+          (sum, record) => sum + parseFloat(record.Debit || 0),
+          0
+        ); // Summing up `Debit` values
+
+        const totalCredit = statementRecords.reduce(
+          (sum, record) => sum + parseFloat(record.Credit || 0),
+          0
+        ); // Summing up `Credit` values
+
+        setBalanceAsPerStmt((totalDebit - totalCredit).toFixed(2)); // Net total
+        setStatementRecordCount(statementRecords.length);
+      } catch (error) {
+        console.error("Error fetching statement data:", error);
+      }
+    };
+
+    fetchStatementData();
+  }, [currentSession]);
 
   return (
     <div>
