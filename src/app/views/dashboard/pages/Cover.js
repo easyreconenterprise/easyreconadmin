@@ -55,12 +55,12 @@ const Cover = () => {
   const { logout, user } = useAuth();
   const { sessions, currentSession, setCurrentSession, switchSession } =
     useContext(SessionContext);
-  const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("0.0");
-  const [balanceAsPerLedger, setBalanceAsPerLedger] = useState("0.0");
-  const [ledgerRecordCount, setLedgerRecordCount] = useState(0);
-  const [ledgerTotalValue, setLedgerTotalValue] = useState("0.0");
+  const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("");
+  const [balanceAsPerLedger, setBalanceAsPerLedger] = useState("");
+  const [ledgerRecordCount, setLedgerRecordCount] = useState("");
+  const [ledgerTotalValue, setLedgerTotalValue] = useState("");
 
-  const [balanceAsPerLedgerDate, setBalanceAsPerLedgerDate] = useState("0.0");
+  const [balanceAsPerLedgerDate, setBalanceAsPerLedgerDate] = useState("");
   const [balanceAsPerStatementDate, setBalanceAsPerStatementDate] =
     useState("0.0");
   const [lastLedgerDate, setLastLedgerDate] = useState(null);
@@ -74,7 +74,7 @@ const Cover = () => {
   const subscribarList = [
     {
       accountInfo: "Total No of Record(Ledger)",
-      count: ledgerRecordCount.toString(),
+      count: ledgerRecordCount,
       value: balanceAsPerLedger,
     },
     {
@@ -89,7 +89,7 @@ const Cover = () => {
     },
     {
       accountInfo: "Total No of Record(Stmt)",
-      count: statementRecordCount.toString(),
+      count: statementRecordCount,
       value: balanceAsPerStmt,
     },
     {
@@ -321,7 +321,7 @@ const Cover = () => {
         if (!currentSession?._id) return;
 
         const response = await axios.get(
-          `${apiUrl}/api/ledger/${currentSession._id}`,
+          `${apiUrl}/api/all-ledger/${currentSession._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -329,19 +329,14 @@ const Cover = () => {
           }
         );
 
-        const ledgerRecords = response.data || [];
-        const totalDebit = ledgerRecords.reduce(
-          (sum, record) => sum + parseFloat(record.Debit || 0),
-          0
-        ); // Summing up `Debit` values
+        const ledgerRecords = response.data?.ledgers || [];
+        console.log("Fetched Ledger Records:", ledgerRecords);
 
-        const totalCredit = ledgerRecords.reduce(
-          (sum, record) => sum + parseFloat(record.Credit || 0),
-          0
-        ); // Summing up `Credit` values
+        setLedgerRecordCount(ledgerRecords.length); // Setting the state
 
-        setLedgerRecordCount(ledgerRecords.length);
-        // setLedgerTotalValue((totalDebit - totalCredit).toFixed(2)); // Net total
+        // Direct logging after state update
+        console.log("Ledger Record Count:", ledgerRecords.length);
+        console.log("Ledger Record Count State:", ledgerRecordCount); // Log state
       } catch (error) {
         console.error("Error fetching ledger data:", error);
       }
@@ -350,6 +345,8 @@ const Cover = () => {
     fetchLedgerData();
   }, [currentSession]);
 
+  // Additional logging
+  console.log("Count:", ledgerRecordCount);
   useEffect(() => {
     const fetchStatementData = async () => {
       try {
@@ -357,7 +354,7 @@ const Cover = () => {
         if (!currentSession?._id) return;
 
         const response = await axios.get(
-          `${apiUrl}/api/statements/${currentSession._id}`,
+          `${apiUrl}/api/all-statements/${currentSession._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -365,19 +362,14 @@ const Cover = () => {
           }
         );
 
-        const statementRecords = response.data || [];
-        const totalDebit = statementRecords.reduce(
-          (sum, record) => sum + parseFloat(record.Debit || 0),
-          0
-        ); // Summing up `Debit` values
+        const statementRecords = response.data?.statements || [];
+        console.log("Fetched Statement Records:", statementRecords);
 
-        const totalCredit = statementRecords.reduce(
-          (sum, record) => sum + parseFloat(record.Credit || 0),
-          0
-        ); // Summing up `Credit` values
+        setStatementRecordCount(statementRecords.length); // Setting the state
 
-        setBalanceAsPerStmt((totalDebit - totalCredit).toFixed(2)); // Net total
-        setStatementRecordCount(statementRecords.length);
+        // Direct logging after state update
+        console.log("Statement Record Count:", statementRecords.length);
+        console.log("Statement Record Count State:", statementRecordCount); // Log state
       } catch (error) {
         console.error("Error fetching statement data:", error);
       }
@@ -385,6 +377,9 @@ const Cover = () => {
 
     fetchStatementData();
   }, [currentSession]);
+
+  // Additional logging for verification
+  console.log("Final Statement Record Count:", statementRecordCount);
 
   return (
     <div>
