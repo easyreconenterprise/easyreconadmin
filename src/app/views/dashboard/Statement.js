@@ -262,11 +262,11 @@ const Statement = ({}) => {
               <tr>
                 <td className="closing"></td>
                 <td className="debit">
-                  <p>{debitItemsCount} time(s) Debit</p>
+                  <p>{debitItemsCount} time(s) Credit</p>
                   <p></p>
                 </td>
                 <td className="credit">
-                  <p>{creditItemsCount} time(s) Debit</p>
+                  <p>{creditItemsCount} time(s) Credit</p>
                   <p></p>
                 </td>
               </tr>
