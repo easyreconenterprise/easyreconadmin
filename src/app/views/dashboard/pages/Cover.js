@@ -481,9 +481,16 @@ const Cover = () => {
 
                     <TableBody>
                       <TableRow>
-                        <TableCell className="debit" align="left">
+                        {/*}  <TableCell className="debit" align="left">
                           -{balanceAsPerLedger}
+                        </TableCell>*/}
+
+                        <TableCell className="debit" align="left">
+                          {balanceAsPerLedger < 0
+                            ? balanceAsPerLedger
+                            : `-${balanceAsPerLedger}`}
                         </TableCell>
+
                         <TableCell className="credit" align="center">
                           <p>{balanceAsPerStmt}</p>
                         </TableCell>
