@@ -184,10 +184,20 @@ const UnMappedData = () => {
                     <p>Closing Balance</p>
                     <p> {balanceAsPerLedger}</p>
                   </td>
-                  <td className="debit">
+                  {/*} <td className="debit">
                     <p>Total Debit</p>
                     <p>-{totalDebit.toFixed(2)}</p>
+                  </td>*/}
+
+                  <td className="debit">
+                    <p>Total Debit</p>
+                    <p>
+                      {totalDebit < 0
+                        ? totalDebit.toFixed(2)
+                        : `-${totalDebit.toFixed(2)}`}
+                    </p>
                   </td>
+
                   <td className="credit">
                     <p>Total Credit</p>
                     <p>{totalCredit.toFixed(2)}</p>
