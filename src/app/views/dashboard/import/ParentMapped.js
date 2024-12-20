@@ -793,7 +793,7 @@ const ParentMapped = () => {
                     <td>{data.Details}</td>
 
                     <td>{data.Debit}</td>
-                    {/*}    <td>{Math.abs(data.Debit)}</td>*/}
+
                     <td>{data.USID}</td>
                   </tr>
                 )
