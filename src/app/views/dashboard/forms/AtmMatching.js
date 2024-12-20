@@ -880,7 +880,13 @@
 // export default AtmMatching;
 import { DatePicker } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import { MenuItem, Modal, Select, Stack } from "@mui/material";
+import {
+  MenuItem,
+  Modal,
+  Select,
+  Stack,
+  CircularProgress,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { Breadcrumb, SimpleCard } from "app/components";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -960,6 +966,7 @@ const AtmMatching = () => {
   });
   const { currentSession } = useContext(SessionContext);
   console.log("Current Session:", currentSession);
+  const [loading, setLoading] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const { matchedItems, setMatchedItems } = useMatchedItems() || {
@@ -1111,6 +1118,7 @@ const AtmMatching = () => {
       // Function to send matched items in batches
       const batchSendMatches = async (items, batchSize = 50) => {
         const totalItems = items.length;
+        setLoading(true);
 
         for (let i = 0; i < totalItems; i += batchSize) {
           const batch = items.slice(i, i + batchSize);
@@ -1133,12 +1141,11 @@ const AtmMatching = () => {
             console.log(
               `Batch ${Math.ceil(i / batchSize) + 1} sent successfully`
             );
-
+            setLoading(false);
             if (response.data.success) {
-              console.log(
-                "Matched items saved successfully:",
-                response.data.data
-              );
+              alert("Matched items saved successfully.");
+            } else {
+              alert("Failed to save matched items.");
             }
           } catch (error) {
             console.error("Error saving matched items in batch:", error);
@@ -1203,6 +1210,7 @@ const AtmMatching = () => {
 
   return (
     <div>
+      {loading && <CircularProgress />}
       <Container>
         <Stack spacing={3}>
           <SimpleCard>

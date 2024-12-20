@@ -722,7 +722,7 @@ const ParentMapped = () => {
         </FormControl>
       </Grid>
       <div
-        style={{ display: "flex" }}
+        style={{ display: "flex", marginBottom: "100px" }}
         className="containers bottom-scroll-container"
       >
         {/* Ledger Section */}
@@ -761,10 +761,19 @@ const ParentMapped = () => {
                 color: "white",
               }}
             >
-              <p style={{ margin: 0 }}>
+              {/*}  <p style={{ margin: 0 }}>
                 {ledgerData.length > 1 || ledgerData.length === 0
                   ? `${ledgerData.length} items`
                   : `${ledgerData.length} item`}
+              </p>*/}
+
+              <p style={{ margin: 0 }}>
+                {dateFilter === "allMatched"
+                  ? exactMatches.length
+                  : ledgerData.length}
+                {ledgerData.length > 1 || ledgerData.length === 0
+                  ? ` items`
+                  : ` item`}
               </p>
             </div>
           </div>
@@ -825,10 +834,19 @@ const ParentMapped = () => {
                 color: "white",
               }}
             >
-              <p style={{ margin: 0 }}>
+              {/*} <p style={{ margin: 0 }}>
                 {statementData.length > 1 || statementData.length === 0
                   ? `${statementData.length} items`
                   : `${statementData.length} item`}
+              </p>*/}
+
+              <p style={{ margin: 0 }}>
+                {dateFilter === "allMatched"
+                  ? exactMatches.length
+                  : statementData.length}
+                {statementData.length > 1 || statementData.length === 0
+                  ? ` items`
+                  : ` item`}
               </p>
             </div>
           </div>
