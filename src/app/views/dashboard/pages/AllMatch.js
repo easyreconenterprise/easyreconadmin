@@ -82,22 +82,6 @@ const AllMatch = () => {
   });
   const apiUrl = process.env.REACT_APP_API_URL.trim();
 
-  //   const handleSubmit = async (e) => {
-  //     e.preventDefault();
-
-  //     try {
-  //       await axios.post(`${apiUrl}/api/`, {
-
-  //       });
-
-  //       // navigate("/dashboard/admin");
-  //       toast.success("User successfully created");
-  //     } catch (err) {
-  //       console.error("Error registering student:", err);
-  //       toast.error("Unable to create user");
-  //     }
-  //   };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -176,66 +160,6 @@ const AllMatch = () => {
     fetchAccounts();
   }, [formData.domainId, apiUrl]);
 
-  //   const handleDownload = async () => {
-  //     const { affiliateId, domainId, accountId } = formData;
-
-  //     if (!affiliateId || !domainId || !accountId) {
-  //       toast.error("Please select affiliate, domain, and account.");
-  //       return;
-  //     }
-
-  //     if (!currentSession) return;
-
-  //     const switchId = currentSession._id;
-  //     const token = localStorage.getItem("jwtToken");
-
-  //     try {
-  //       const token = localStorage.getItem("jwtToken");
-  //       const response = await axios.get(`${apiUrl}/api/matches/${switchId}`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-
-  //       const matchedData = response.data; // Assuming this contains matched items
-
-  //       if (response.data.success) {
-  //         setExactMatches(matchedData.exactMatches || []);
-  //         setMatchedStatements(matchedData.matchedStatements || []);
-  //         generateExcelFile(matchedData); // Create and download the Excel file
-  //       } else {
-  //         toast.error("Failed to fetch matched items.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching matched items:", error);
-  //       toast.error("Error fetching matched items.");
-  //     }
-  //   };
-  //   const handleDownload = async () => {
-  //     if (!currentSession) {
-  //       toast.error("No session available.");
-  //       return;
-  //     }
-
-  //     const switchId = currentSession._id;
-  //     const token = localStorage.getItem("jwtToken");
-
-  //     try {
-  //       const response = await axios.get(`${apiUrl}/api/matches/${switchId}`, {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       });
-  //       console.log("API Response:", response.data); // Log the response to see what is being returned
-
-  //       const matchedData = response.data; // Assuming this contains matched items
-
-  //       if (response.data.success) {
-  //         generateExcelFile(matchedData); // Create and download the Excel file
-  //       } else {
-  //         toast.error("Failed to fetch matched items.");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching matched items:", error);
-  //       toast.error("Error fetching matched items.");
-  //     }
-  //   };
   const handleDownload = async () => {
     if (!currentSession) {
       toast.error("No session available.");
@@ -246,9 +170,12 @@ const AllMatch = () => {
     const token = localStorage.getItem("jwtToken");
 
     try {
-      const response = await axios.get(`${apiUrl}/api/matches/${switchId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${apiUrl}/api/matches/last-uploaded/${switchId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       console.log("API Response:", response.data); // Log the response to see what is being returned
 
@@ -265,53 +192,6 @@ const AllMatch = () => {
       toast.error("Error fetching matched items.");
     }
   };
-
-  //   const generateExcelFile = (response) => {
-  //     // Correctly access exactMatches and matchedStatements from the nested data object
-  //     const exactMatches = Array.isArray(response.data?.exactMatches)
-  //       ? response.data.exactMatches
-  //       : [];
-  //     const matchedStatements = Array.isArray(response.data?.matchedStatements)
-  //       ? response.data.matchedStatements
-  //       : [];
-
-  //     // Debugging: Log the exactMatches and matchedStatements to check data
-  //     console.log("Exact Matches: ", exactMatches);
-  //     console.log("Matched Statements: ", matchedStatements);
-
-  //     // If no matches found, notify the user and exit
-  //     if (exactMatches.length === 0 && matchedStatements.length === 0) {
-  //       toast.error("No matches found to generate the Excel file.");
-  //       return;
-  //     }
-
-  //     const sheetData = [
-  //       ...exactMatches.map((match, index) => ({
-  //         Type: "Exact Match",
-  //         MatchDetail: match.detail || JSON.stringify(match), // Adjust this according to your exact match data structure
-  //         Index: index + 1, // Include index for better tracking in the sheet
-  //         LedgerInfo: match.ledgerInfo || "N/A", // Add ledger-related details or "N/A" if not available
-  //       })),
-  //       ...matchedStatements.map((statement, index) => ({
-  //         Type: "Statement Match",
-  //         MatchDetail: statement.detail || JSON.stringify(statement), // Adjust this according to your statement match data structure
-  //         Index: index + 1 + exactMatches.length, // Ensure unique index continues after exact matches
-  //         StatementInfo: statement.statementInfo || "N/A", // Add statement-related details or "N/A" if not available
-  //       })),
-  //     ];
-
-  //     // Create a worksheet
-  //     const ws = XLSX.utils.json_to_sheet(sheetData);
-
-  //     // Create a new workbook
-  //     const wb = XLSX.utils.book_new();
-
-  //     // Add the worksheet to the workbook
-  //     XLSX.utils.book_append_sheet(wb, ws, "Matched Items");
-
-  //     // Generate and download an Excel file
-  //     XLSX.writeFile(wb, "matched_items.xlsx");
-  //   };
 
   const generateExcelFile = (response) => {
     // Correctly access exactMatches and matchedStatements from the nested data object
