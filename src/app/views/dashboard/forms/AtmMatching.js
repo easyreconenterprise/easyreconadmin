@@ -1282,7 +1282,6 @@ const AtmMatching = () => {
         <Modal open={open} onClose={handleClose}>
           <Box sx={modalStyle}>
             <h2>Match Result</h2>
-
             {matchedItems &&
               matchedItems.exact &&
               matchedItems.exact.length > 0 && (
@@ -1291,7 +1290,13 @@ const AtmMatching = () => {
                   {/* Render exact match items here */}
                 </div>
               )}
-
+            {matchedItems &&
+              matchedItems.exact &&
+              matchedItems.exact.length === 0 && (
+                <div>
+                  <h3>Exact Match Items: (0)</h3>
+                </div>
+              )}
             {matchedItems &&
               matchedItems.probable &&
               matchedItems.probable.length > 0 && (
@@ -1300,7 +1305,13 @@ const AtmMatching = () => {
                   {/* Render probable match items here */}
                 </div>
               )}
-
+            {matchedItems &&
+              matchedItems.probable &&
+              matchedItems.probable.length === 0 && (
+                <div>
+                  <h3>Probable Match Items: (0)</h3>
+                </div>
+              )}
             {matchedItems &&
               matchedItems.similar &&
               matchedItems.similar.length > 0 && (
@@ -1311,20 +1322,43 @@ const AtmMatching = () => {
                   {/* Render similar match items here */}
                 </div>
               )}
-
             {matchedItems &&
+              matchedItems.similar &&
+              matchedItems.similar.length === 0 && (
+                <div>
+                  <h3>Similar Details Match Items: (0)</h3>
+                </div>
+              )}
+            {/*} {matchedItems &&
               matchedItems.manyToOne &&
               matchedItems.manyToOne.length > 0 && (
                 <div>
                   <h3>
                     Many-to-One Match Items: {matchedItems.manyToOne.length}
                   </h3>
-                  {/* Render probable match items here */}
+                 
+                </div>
+              )}*/}
+            {matchedItems &&
+              matchedItems.manyToOne &&
+              matchedItems.manyToOne.length > 0 && (
+                <div>
+                  {" "}
+                  <h3>
+                    Many-to-One Match Items: {matchedItems.manyToOne.length}
+                  </h3>{" "}
+                  {/* Render many-to-one match items here */}{" "}
+                </div>
+              )}{" "}
+            {matchedItems &&
+              matchedItems.manyToOne &&
+              matchedItems.manyToOne.length === 0 && (
+                <div>
+                  {" "}
+                  <h3>Many-to-One Match Items: (0)</h3>{" "}
                 </div>
               )}
-
             <Button onClick={handleClose}>Close</Button>
-
             <Button onClick={handleSave} variant="contained" color="primary">
               Save Matched Items
             </Button>
