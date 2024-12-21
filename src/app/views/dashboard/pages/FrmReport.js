@@ -179,55 +179,28 @@ const FrmReport = () => {
   };
 
   const generateExcelFile = (response) => {
-    // Correctly access exactMatches and matchedStatements from the nested data object
-    const exactMatches = Array.isArray(response.data?.exactMatches)
-      ? response.data.exactMatches
-      : [];
-    const matchedStatements = Array.isArray(response.data?.matchedStatements)
-      ? response.data.matchedStatements
-      : [];
+    // Access unmatchedItems from the response
+    const unmatchedItems = Array.isArray(response.data) ? response.data : [];
 
-    // Debugging: Log the exactMatches and matchedStatements to check data
-    console.log("Exact Matches: ", exactMatches);
-    console.log("Matched Statements: ", matchedStatements);
+    // Debugging: Log unmatchedItems to check data
+    console.log("Unmatched Items: ", unmatchedItems);
 
-    // If no matches found, notify the user and exit
-    if (exactMatches.length === 0 && matchedStatements.length === 0) {
-      toast.error("No matches found to generate the Excel file.");
+    // If no unmatched items found, notify the user and exit
+    if (unmatchedItems.length === 0) {
+      toast.error("No unmatched items found to generate the Excel file.");
       return;
     }
 
     // Prepare the sheet data
-    const sheetData = [];
-
-    // The maximum number of rows we need to account for in the Excel sheet
-    const maxLength = Math.max(exactMatches.length, matchedStatements.length);
-
-    for (let i = 0; i < maxLength; i++) {
-      const exactMatch = exactMatches[i] || {}; // Get exact match or empty object
-      const matchedStatement = matchedStatements[i] || {}; // Get matched statement or empty object
-
-      // Add the row to sheetData
-      sheetData.push({
-        // Columns for Exact Matches (A to F)
-        Type: "Exact Match", // Column A
-        MatchDetail: exactMatch.detail || "", // Column B
-        PostDate: exactMatch.PostDate || "", // Column C
-        ValDate: exactMatch.ValDate || "", // Column D
-        LedgerInfo: exactMatch.Details || "", // Column E
-        Debit: exactMatch.Debit || "0", // Column F
-        Credit: exactMatch.Credit || "0", // Column G
-
-        // Columns for Matched Statements (H to L)
-        StatementType: "Statement Match", // Column H
-        StatementMatchDetail: matchedStatement.detail || "", // Column I
-        StatementPostDate: matchedStatement.PostDate || "", // Column J
-        StatementValDate: matchedStatement.ValDate || "", // Column K
-        StatementLedgerInfo: matchedStatement.Details || "", // Column L
-        StatementDebit: matchedStatement.Debit || "0", // Column M
-        StatementCredit: matchedStatement.Credit || "0", // Column N
-      });
-    }
+    const sheetData = unmatchedItems.map((item, index) => ({
+      "S/N": index + 1, // Serial Number
+      Type: item.type, // Type (ledger or statement)
+      PostDate: item.details?.PostDate || "", // Post Date
+      ValDate: item.details?.ValDate || "", // Value Date
+      Details: item.details?.Details || "", // Details
+      Debit: item.details?.Debit || "0", // Debit
+      Credit: item.details?.Credit || "0", // Credit
+    }));
 
     // Create a worksheet
     const ws = XLSX.utils.json_to_sheet(sheetData);
@@ -236,11 +209,12 @@ const FrmReport = () => {
     const wb = XLSX.utils.book_new();
 
     // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(wb, ws, "Matched Items");
+    XLSX.utils.book_append_sheet(wb, ws, "Unmatched Items");
 
     // Generate and download an Excel file
-    XLSX.writeFile(wb, "matched_items.xlsx");
+    XLSX.writeFile(wb, "unmatched_items.xlsx");
   };
+
   return (
     <div>
       <Container>
