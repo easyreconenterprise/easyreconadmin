@@ -291,7 +291,11 @@ const RestoreData = ({ open, onClose, onSubmit }) => {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogContent>
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <Tabs value={activeTab} onChange={handleTabChange} centered>
           <Tab label="Auto Match" />
           <Tab label="Data Capture" />
