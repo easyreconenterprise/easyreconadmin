@@ -115,7 +115,7 @@ import DropDown from "./DropDown";
 const UnMappedTable = ({
   data,
   headers,
-  handleDragStart,
+
   setData,
   handleDropUnmapped,
   setMappedData,
@@ -164,13 +164,7 @@ const UnMappedTable = ({
         </thead>
         <tbody>
           {data?.map((rowData, index) => (
-            <tr
-              key={index}
-              draggable
-              onDragStart={(event) => handleDragStart(event, rowData)}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
+            <tr key={index}>
               {headers?.map((header) => (
                 <td key={header}>{rowData[header]}</td>
               ))}

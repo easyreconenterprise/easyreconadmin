@@ -23,6 +23,7 @@ import KeyIn from "./KeyIn";
 import { SessionContext } from "../SwitchContext";
 import WorkingMonth from "./WorkingMonth";
 import ChooseMonth from "./ChooseMonth";
+import RestoreData from "./RestoreData";
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -84,6 +85,7 @@ const Layout1Topbar = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openWorkingMonthModal, setOpenWorkingMonthModal] = useState(false);
   const [openChooseMonthModal, setOpenChooseMonthModal] = useState(false);
+  const [openRestoreDataModal, setOpenRestoreDataModal] = useState(false);
   const { sessions, currentSession, setCurrentSession, switchSession } =
     useContext(SessionContext);
 
@@ -137,9 +139,16 @@ const Layout1Topbar = () => {
   const handleCloseChooseMonthModal = () => {
     setOpenChooseMonthModal(false);
   };
+  const handleCloseRestoreDataModal = () => {
+    setOpenRestoreDataModal(false);
+  };
   const handleOpenChooseMonthModal = (event) => {
     event.stopPropagation();
     setOpenChooseMonthModal(true);
+  };
+  const handleOpenRestoreDataModal = (event) => {
+    event.stopPropagation();
+    setOpenRestoreDataModal(true);
   };
   return (
     <>
@@ -507,11 +516,18 @@ const Layout1Topbar = () => {
                       onSubmit={handleSubmitModal}
                     />
                   )}
-                  <StyledItem>
-                    <Link to="/dashboard/tb">
-                      <Span> Restore Data </Span>
-                    </Link>
+
+                  <StyledItem onClick={handleOpenRestoreDataModal}>
+                    <Span>Restore Data</Span>
                   </StyledItem>
+
+                  {openRestoreDataModal && (
+                    <RestoreData
+                      open={openRestoreDataModal}
+                      onClose={handleCloseRestoreDataModal}
+                      onSubmit={handleSubmitModal}
+                    />
+                  )}
                 </MatxMenu>
                 <div
                   onClick={logout}
