@@ -502,11 +502,11 @@ const Layout1Topbar = () => {
                     />
                   )}
 
-                  <StyledItem
+                  {/*<StyledItem
                     onClick={(event) => handleOpenChooseMonthModal(event)}
                   >
                     <Span> Choose working Month </Span>
-                  </StyledItem>
+                  </StyledItem>*/}
 
                   {/* Conditionally render ChooseMonth */}
                   {openChooseMonthModal && (
