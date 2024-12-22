@@ -719,27 +719,27 @@ const AtmMatching = () => {
             {/*} <Button onClick={handleSave} variant="contained" color="primary">
               Save Matched Items
             </Button>*/}
-            <button
+            <Button
               onClick={() => handleSave("exact")}
               variant="contained"
               color="primary"
             >
               Save Exact Matches
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleSave("similar")}
               variant="contained"
               color="primary"
             >
               Save Similar Matches
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleSave("probable")}
               variant="contained"
               color="primary"
             >
               Save Probable Matches
-            </button>
+            </Button>
           </Box>
         </Modal>
 
