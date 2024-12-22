@@ -393,9 +393,69 @@ const AtmMatching = () => {
     console.log("Updated Matched Items:", matchedItems);
   }, [matchedItems]);
 
-  const handleSave = async () => {
-    if (matchedItems.exact.length > 0) {
-      const uploadSessionId = matchedItems.exact[0].uploadSessionId;
+  // const handleSave = async () => {
+  //   if (matchedItems.exact.length > 0) {
+  //     const uploadSessionId = matchedItems.exact[0].uploadSessionId;
+
+  //     // Function to send matched items in batches
+  //     const batchSendMatches = async (items, batchSize = 50) => {
+  //       const totalItems = items.length;
+  //       setLoading(true);
+
+  //       for (let i = 0; i < totalItems; i += batchSize) {
+  //         const batch = items.slice(i, i + batchSize);
+
+  //         try {
+  //           const isFirstBatch = i === 0;
+
+  //           const response = await axios.post(`${apiUrl}/api/matches`, {
+  //             accountId: currentSession.account,
+  //             switchId: currentSession._id,
+  //             exactMatches: batch, // Send only the current batch
+  //             probableMatches: matchedItems.probable,
+  //             similarDetailsMatches: matchedItems.similar,
+  //             matchedStatements: isFirstBatch
+  //               ? matchedItems.matchedStatements
+  //               : [], // Send matchedStatements only once
+  //             unmatchedItems: matchedItems.unmatchedItems,
+  //             uploadSessionId: uploadSessionId,
+  //           });
+
+  //           console.log(
+  //             `Batch ${Math.ceil(i / batchSize) + 1} sent successfully`
+  //           );
+  //           setLoading(false);
+  //           if (response.data.success) {
+  //             alert("Matched items saved successfully.");
+  //           } else {
+  //             alert("Failed to save matched items.");
+  //           }
+  //         } catch (error) {
+  //           console.error("Error saving matched items in batch:", error);
+  //         }
+  //       }
+  //     };
+
+  //     // Call the batch send function
+  //     await batchSendMatches(matchedItems.exact);
+  //   } else {
+  //     console.error("No matched items to save.");
+  //   }
+  // };
+
+  const handleSave = async (matchType) => {
+    const matchData = matchedItems[matchType]; // Dynamically get the match type
+
+    if (matchData && matchData.length > 0) {
+      const uploadSessionId =
+        matchedItems.exact.length > 0
+          ? matchedItems.exact[0].uploadSessionId
+          : matchedItems[matchType][0]?.uploadSessionId || null; // Fallback to other match types for uploadSessionId
+
+      if (!uploadSessionId) {
+        console.error("No uploadSessionId found.");
+        return;
+      }
 
       // Function to send matched items in batches
       const batchSendMatches = async (items, batchSize = 50) => {
@@ -411,35 +471,41 @@ const AtmMatching = () => {
             const response = await axios.post(`${apiUrl}/api/matches`, {
               accountId: currentSession.account,
               switchId: currentSession._id,
-              exactMatches: batch, // Send only the current batch
-              probableMatches: matchedItems.probable,
-              similarDetailsMatches: matchedItems.similar,
-              matchedStatements: isFirstBatch
-                ? matchedItems.matchedStatements
-                : [], // Send matchedStatements only once
+              [`${matchType}Matches`]: batch, // Dynamically send the current batch for the selected match type
+              matchedStatements:
+                isFirstBatch && matchType === "similar"
+                  ? matchedItems.matchedStatements
+                  : [], // Only send matchedStatements for the first batch if saving similar matches
               unmatchedItems: matchedItems.unmatchedItems,
               uploadSessionId: uploadSessionId,
             });
 
             console.log(
-              `Batch ${Math.ceil(i / batchSize) + 1} sent successfully`
+              `Batch ${
+                Math.ceil(i / batchSize) + 1
+              } of ${matchType} sent successfully`
             );
             setLoading(false);
+
             if (response.data.success) {
-              alert("Matched items saved successfully.");
+              alert(
+                `${
+                  matchType.charAt(0).toUpperCase() + matchType.slice(1)
+                } items saved successfully.`
+              );
             } else {
-              alert("Failed to save matched items.");
+              alert(`Failed to save ${matchType} items.`);
             }
           } catch (error) {
-            console.error("Error saving matched items in batch:", error);
+            console.error(`Error saving ${matchType} items in batch:`, error);
           }
         }
       };
 
       // Call the batch send function
-      await batchSendMatches(matchedItems.exact);
+      await batchSendMatches(matchData);
     } else {
-      console.error("No matched items to save.");
+      console.error(`No ${matchType} items to save.`);
     }
   };
 
@@ -650,9 +716,30 @@ const AtmMatching = () => {
                 </div>
               )}
             <Button onClick={handleClose}>Close</Button>
-            <Button onClick={handleSave} variant="contained" color="primary">
+            {/*} <Button onClick={handleSave} variant="contained" color="primary">
               Save Matched Items
-            </Button>
+            </Button>*/}
+            <button
+              onClick={() => handleSave("exact")}
+              variant="contained"
+              color="primary"
+            >
+              Save Exact Matches
+            </button>
+            <button
+              onClick={() => handleSave("similar")}
+              variant="contained"
+              color="primary"
+            >
+              Save Similar Matches
+            </button>
+            <button
+              onClick={() => handleSave("probable")}
+              variant="contained"
+              color="primary"
+            >
+              Save Probable Matches
+            </button>
           </Box>
         </Modal>
 
