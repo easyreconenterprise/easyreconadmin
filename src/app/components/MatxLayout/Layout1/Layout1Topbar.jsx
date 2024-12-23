@@ -82,6 +82,8 @@ const Layout1Topbar = () => {
   const theme = useTheme();
   const { settings, updateSettings } = useSettings();
   const { logout, user } = useAuth();
+  const [confirmMode, setConfirmMode] = useState(false);
+
   const [openModal, setOpenModal] = useState(false);
   const [openWorkingMonthModal, setOpenWorkingMonthModal] = useState(false);
   const [openChooseMonthModal, setOpenChooseMonthModal] = useState(false);
@@ -128,8 +130,7 @@ const Layout1Topbar = () => {
     handleCloseModal();
   };
 
-  const handleOpenWorkingMonthModal = (event) => {
-    event.stopPropagation();
+  const handleOpenWorkingMonthModal = () => {
     setOpenWorkingMonthModal(true);
   };
 
@@ -384,44 +385,7 @@ const Layout1Topbar = () => {
                     </Link>
                   </StyledItem>
                 </MatxMenu>
-                <MatxMenu
-                  menuButton={
-                    <UserMenu>
-                      <Hidden xsDown>
-                        <Span>
-                          <strong
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            Adjustment
-                            <Icon
-                              style={{
-                                fontSize: "20px",
-                                marginLeft: "5px",
-                              }}
-                            >
-                              arrow_drop_down
-                            </Icon>
-                          </strong>
-                        </Span>
-                      </Hidden>
-                    </UserMenu>
-                  }
-                >
-                  <StyledItem>
-                    <Link to="/dashboard/trial-balance">
-                      <Span> Trial Balance </Span>
-                    </Link>
-                  </StyledItem>
 
-                  <StyledItem>
-                    <Link to="/dashboard/tb">
-                      <Span> Mapped Table </Span>
-                    </Link>
-                  </StyledItem>
-                </MatxMenu>
                 <MatxMenu
                   menuButton={
                     <UserMenu>
@@ -487,10 +451,31 @@ const Layout1Topbar = () => {
                     </Link>
                   </StyledItem>
 
-                  <StyledItem
+                  {/*} <StyledItem
                     onClick={(event) => handleOpenWorkingMonthModal(event)}
                   >
                     <Span> Change working Month </Span>
+                  </StyledItem>*/}
+                  <StyledItem>
+                    {!confirmMode ? (
+                      <button
+                        onClick={() => {
+                          setConfirmMode(false);
+                          handleOpenWorkingMonthModal();
+                        }}
+                      >
+                        Choose Working Month
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setConfirmMode(true);
+                          handleOpenWorkingMonthModal();
+                        }}
+                      >
+                        Confirm Working Month
+                      </button>
+                    )}
                   </StyledItem>
 
                   {/* Conditionally render WorkingMonth */}
@@ -499,6 +484,7 @@ const Layout1Topbar = () => {
                       open={openWorkingMonthModal}
                       onClose={handleCloseWorkingMonthModal}
                       onSubmit={handleSubmitModal}
+                      confirmMode={confirmMode}
                     />
                   )}
 
@@ -509,13 +495,6 @@ const Layout1Topbar = () => {
                   </StyledItem>*/}
 
                   {/* Conditionally render ChooseMonth */}
-                  {openChooseMonthModal && (
-                    <ChooseMonth
-                      open={openChooseMonthModal}
-                      onClose={handleCloseChooseMonthModal}
-                      onSubmit={handleSubmitModal}
-                    />
-                  )}
 
                   <StyledItem onClick={handleOpenRestoreDataModal}>
                     <Span>Restore Data</Span>

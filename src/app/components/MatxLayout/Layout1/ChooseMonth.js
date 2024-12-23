@@ -62,65 +62,59 @@
 
 // export default SwitchAccount
 
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
-    TextField,
-} from '@mui/material'
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  TextField,
+} from "@mui/material";
 
 const ChooseMonth = ({ open, onClose, onSubmit }) => {
-    const [formData, setFormData] = useState({
-        affiliate: '',
-        domain: '',
-        account: '',
-        month: '',
-    })
+  const [formData, setFormData] = useState({
+    affiliate: "",
+    domain: "",
+    account: "",
+    month: "",
+  });
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: value,
-        }))
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
 
-    const handleSubmit = () => {
-        onSubmit(formData)
-    }
+  const handleSubmit = () => {
+    onSubmit(formData);
+  };
 
-    const handleDialogContentClick = (e) => {
-        // Prevent click events inside the modal content from propagating to the Dialog
-        e.stopPropagation()
-    }
+  const handleDialogContentClick = (e) => {
+    // Prevent click events inside the modal content from propagating to the Dialog
+    e.stopPropagation();
+  };
 
-    return (
-        <Dialog
-            open={open}
-            onClose={onClose}
-            aria-labelledby="form-dialog-title"
-        >
-            <DialogTitle id="form-dialog-title">
-                Choose Working Month
-            </DialogTitle>
-            <DialogContent onClick={handleDialogContentClick}>
-                <label>Are you sure you want to choose this Working Moth</label>
-            </DialogContent>
-            <DialogActions>
-                <Button variant="outlined" color="secondary" onClick={onClose}>
-                    Cancel
-                </Button>
-                <Button color="primary">Save Changes</Button>
-            </DialogActions>
-        </Dialog>
-    )
-}
+  return (
+    <Dialog open={open} onClose={onClose} aria-labelledby="form-dialog-title">
+      <DialogTitle id="form-dialog-title">Choose Working Month</DialogTitle>
+      <DialogContent onClick={handleDialogContentClick}>
+        <label>Are you sure you want to choose this Working Month</label>
+      </DialogContent>
+      <DialogActions>
+        <Button variant="outlined" color="secondary" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button color="primary">Save Changes</Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
-export default ChooseMonth
+export default ChooseMonth;
