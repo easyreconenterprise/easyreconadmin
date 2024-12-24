@@ -108,7 +108,11 @@ const WorkingMonth = ({ open, onClose, onSubmit, confirmMode }) => {
       <DialogTitle id="form-dialog-title">
         {confirmMode ? "Confirm Working Month" : "Choose Working Month"}
       </DialogTitle>
-      <DialogContent onClick={handleDialogContentClick}>
+      <DialogContent
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         {confirmMode ? (
           <label>Are you sure you want to choose this Working Month?</label>
         ) : (
@@ -132,7 +136,7 @@ const WorkingMonth = ({ open, onClose, onSubmit, confirmMode }) => {
           Cancel
         </Button>
         <Button color="primary" onClick={handleSubmit}>
-          Save Changes
+          {confirmMode ? "Confirm" : "Save Changes"}
         </Button>
       </DialogActions>
     </Dialog>

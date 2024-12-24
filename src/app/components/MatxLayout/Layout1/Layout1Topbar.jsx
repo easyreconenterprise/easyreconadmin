@@ -129,14 +129,22 @@ const Layout1Topbar = () => {
 
     handleCloseModal();
   };
+  const handleSubmitWorkingModal = (formData) => {
+    // Add your logic for handling form submission here
+    console.log(formData);
 
-  const handleOpenWorkingMonthModal = () => {
+    handleCloseModal();
+  };
+
+  const handleOpenWorkingMonthModal = (event) => {
+    event.stopPropagation();
     setOpenWorkingMonthModal(true);
   };
 
   const handleCloseWorkingMonthModal = () => {
     setOpenWorkingMonthModal(false);
   };
+
   const handleCloseChooseMonthModal = () => {
     setOpenChooseMonthModal(false);
   };
@@ -456,35 +464,16 @@ const Layout1Topbar = () => {
                   >
                     <Span> Change working Month </Span>
                   </StyledItem>*/}
-                  <StyledItem>
-                    {!confirmMode ? (
-                      <button
-                        onClick={() => {
-                          setConfirmMode(false);
-                          handleOpenWorkingMonthModal();
-                        }}
-                      >
-                        Choose Working Month
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setConfirmMode(true);
-                          handleOpenWorkingMonthModal();
-                        }}
-                      >
-                        Confirm Working Month
-                      </button>
-                    )}
+                  <StyledItem onClick={handleOpenWorkingMonthModal}>
+                    <Span>Change Working Month</Span>
                   </StyledItem>
 
-                  {/* Conditionally render WorkingMonth */}
                   {openWorkingMonthModal && (
                     <WorkingMonth
                       open={openWorkingMonthModal}
                       onClose={handleCloseWorkingMonthModal}
-                      onSubmit={handleSubmitModal}
-                      confirmMode={confirmMode}
+                      onSubmit={handleSubmitWorkingModal}
+                      // confirmMode={confirmMode}
                     />
                   )}
 
