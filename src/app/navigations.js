@@ -24,45 +24,8 @@ export const navigations = [
         color: "#1a2038",
       },
       {
-        name: "Notes 1 -3a",
-        path: "/dashboard/note-1",
-        color: "#1a2038",
-      },
-      {
-        name: "Notes 3a - 3d",
-        path: "/dashboard/note-1-3",
-        color: "#1a2038",
-      },
-      {
-        name: "Notes 3e - 3p",
-        path: "/dashboard/note-3e-p",
-        color: "#1a2038",
-      },
-      {
-        name: "Notes 4-8",
-        path: "/dashboard/note-4-8b",
-        color: "#1a2038",
-      },
-      {
-        name: "Notes 8c-9e",
-        path: "/dashboard/note-8c-9e",
-        color: "#1a2038",
-      },
-      { name: "Note 10a", path: "dashboard/note-10a", color: "#1a2038" },
-      {
-        name: "Notes 11-15b",
-        path: "/dashboard/note-11-15b",
-        color: "#1a2038",
-      },
-      {
-        name: "Notes 15c - 18c",
-        path: "/dashboard/note-15c-18c",
-        color: "#1a2038",
-      },
-      { name: "Note 19", path: "/dashboard/note-19", color: "#1a2038" },
-      {
-        name: "Notes 20 - 24",
-        path: "/dashboard/note-20-24",
+        name: "All Account",
+        path: "/dashboard/all-account",
         color: "#1a2038",
       },
     ],

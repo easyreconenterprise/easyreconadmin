@@ -79,6 +79,7 @@ import CreateDomain from "./pages/CreateDomain";
 import StatementSummary from "./StatementSummary";
 import LedgerSummary from "./LedgerSummary";
 import UnmatchedItems from "./import/UnmatchedTable";
+import AllAccount from "./forms/AllAccount";
 // import SwitchAccount from 'app/components/MatxLayout/Layout1/SwitchAccount'
 
 const Analytics = Loadable(lazy(() => import("./Analytics")));
@@ -140,6 +141,7 @@ const dashboardRoutes = [
   { path: "/dashboard/note-8-9", element: <EighttoNine /> },
   { path: "/dashboard/frmNewAccount", element: <NewAccount /> },
   { path: "/dashboard/frmAccountDialog", element: <CreateAccount /> },
+  { path: "/dashboard/all-account", element: <AllAccount /> },
   { path: "/dashboard/create-domain", element: <CreateDomain /> },
   {
     path: "/dashboard/AtmMatching",
