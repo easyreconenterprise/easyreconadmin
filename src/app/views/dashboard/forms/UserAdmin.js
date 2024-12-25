@@ -10,6 +10,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { Breadcrumb, SimpleCard } from "app/components";
 import SimpleTable from "app/views/material-kit/tables/SimpleTable";
 import { SessionContext } from "app/components/MatxLayout/SwitchContext";
+import CreateUser from "./CreateUser";
 
 const Container = styled("div")(({ theme }) => ({
   margin: "30px",
@@ -199,14 +200,9 @@ const UserAdmin = () => {
         <h2>Application user</h2>
       </Box>
 
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={() => navigate("/dashboard")} // Cancel button functionality
-        style={{ marginTop: "50px" }}
-      >
-        Add New
-      </Button>
+      <Box className="breadcrumb">
+        <CreateUser />
+      </Box>
       <table className="table">
         <thead>
           <tr style={{ textDecoration: "underline 2px" }}>
