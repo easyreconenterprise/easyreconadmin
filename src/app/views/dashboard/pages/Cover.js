@@ -62,7 +62,8 @@ const Cover = () => {
   const [ledgerTotalValue, setLedgerTotalValue] = useState("");
   const [totalRecordMatchedStatements, setTotalRecordMatchedStatements] =
     useState("");
-
+  const [totalUnmatchedStatement, setTotalUnmatchedStatement] = useState("");
+  const [totalUnmatchedLedger, setTotalUnmatchedLedger] = useState("");
   const [balanceAsPerLedgerDate, setBalanceAsPerLedgerDate] = useState("");
   const [balanceAsPerStatementDate, setBalanceAsPerStatementDate] =
     useState("0.0");
@@ -87,7 +88,7 @@ const Cover = () => {
     },
     {
       accountInfo: "Total outstanding record(Ledger)",
-      count: "8 ",
+      count: totalUnmatchedLedger,
       value: "231,332.52",
     },
     {
@@ -101,8 +102,8 @@ const Cover = () => {
       value: "231,332.52",
     },
     {
-      accountInfo: "Total outstanding record(Ledger)",
-      count: "21",
+      accountInfo: "Total outstanding record(Stmt)",
+      count: totalUnmatchedStatement,
       value: "231,332.52",
     },
   ];
@@ -511,6 +512,58 @@ const Cover = () => {
     fetchMatchedStatementsCount();
   }, [currentSession, apiUrl]);
 
+  useEffect(() => {
+    const fetchUnmatchedStatementCount = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!currentSession?._id) {
+          console.warn("No currentSession._id available");
+          return;
+        }
+        const response = await axios.get(
+          `${apiUrl}/api/matches/total-unmatched-statement/${currentSession._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Update state with the unmatched statement count
+        setTotalUnmatchedStatement(response.data.data.count || 0);
+      } catch (error) {
+        console.error("Error fetching unmatched statement items:", error);
+      }
+    };
+
+    fetchUnmatchedStatementCount();
+  }, [currentSession, apiUrl]);
+  useEffect(() => {
+    const fetchUnmatchedLedgerCount = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!currentSession?._id) {
+          console.warn("No currentSession._id available");
+          return;
+        }
+        const response = await axios.get(
+          `${apiUrl}/api/matches/total-unmatched-ledger/${currentSession._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Update state with the unmatched statement count
+        setTotalUnmatchedLedger(response.data.data.count || 0);
+      } catch (error) {
+        console.error("Error fetching unmatched statement items:", error);
+      }
+    };
+
+    fetchUnmatchedLedgerCount();
+  }, [currentSession, apiUrl]);
   return (
     <div>
       <div>
