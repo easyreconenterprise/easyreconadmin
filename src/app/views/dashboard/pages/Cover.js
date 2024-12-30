@@ -58,7 +58,10 @@ const Cover = () => {
   const [balanceAsPerStmt, setBalanceAsPerStmt] = useState("");
   const [balanceAsPerLedger, setBalanceAsPerLedger] = useState("");
   const [ledgerRecordCount, setLedgerRecordCount] = useState("");
+  const [totalRecordMatchedLedger, setTotalRecordMatchedLedger] = useState("");
   const [ledgerTotalValue, setLedgerTotalValue] = useState("");
+  const [totalRecordMatchedStatements, setTotalRecordMatchedStatements] =
+    useState("");
 
   const [balanceAsPerLedgerDate, setBalanceAsPerLedgerDate] = useState("");
   const [balanceAsPerStatementDate, setBalanceAsPerStatementDate] =
@@ -79,7 +82,7 @@ const Cover = () => {
     },
     {
       accountInfo: "Total Record Matched(Ledger)",
-      count: "10 ",
+      count: totalRecordMatchedLedger,
       value: "231,332.52",
     },
     {
@@ -94,7 +97,7 @@ const Cover = () => {
     },
     {
       accountInfo: "Total Record Matched(Stmt)",
-      count: "1",
+      count: totalRecordMatchedStatements,
       value: "231,332.52",
     },
     {
@@ -450,6 +453,63 @@ const Cover = () => {
 
   // Additional logging for verification
   console.log("Final Statement Record Count:", statementRecordCount);
+
+  useEffect(() => {
+    const fetchMatchedLedgerCount = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!currentSession?._id) {
+          console.warn("No currentSession._id available");
+          return;
+        }
+
+        const response = await axios.get(
+          `${apiUrl}/api/matches/total-matched-ledger/${currentSession._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const matchedCount = response.data.data.count || 0; // Correct path
+        console.log("Matched Ledger Count:", matchedCount);
+        setTotalRecordMatchedLedger(matchedCount);
+      } catch (error) {
+        console.error("Error fetching matched ledger count:", error);
+      }
+    };
+
+    fetchMatchedLedgerCount();
+  }, [currentSession, apiUrl]);
+
+  useEffect(() => {
+    const fetchMatchedStatementsCount = async () => {
+      try {
+        const token = localStorage.getItem("jwtToken");
+        if (!currentSession?._id) {
+          console.warn("No currentSession._id available");
+          return;
+        }
+
+        const response = await axios.get(
+          `${apiUrl}/api/matches/total-matched-statements/${currentSession._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const matchedCount = response.data.data.count || 0;
+        setTotalRecordMatchedStatements(matchedCount);
+      } catch (error) {
+        console.error("Error fetching matched statements count:", error);
+      }
+    };
+
+    fetchMatchedStatementsCount();
+  }, [currentSession, apiUrl]);
 
   return (
     <div>
