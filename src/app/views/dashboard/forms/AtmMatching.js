@@ -474,18 +474,26 @@ const AtmMatching = () => {
           try {
             const isFirstBatch = i === 0;
 
-            const response = await axios.post(`${apiUrl}/api/matches`, {
-              accountId: currentSession.account,
-              switchId: currentSession._id,
-              exactMatches: batch, // Send only the current batch
-              probableMatches: matchedItems.probable,
-              similarDetailsMatches: matchedItems.similar,
-              matchedStatements: isFirstBatch
-                ? matchedItems.matchedStatements
-                : [], // Send matchedStatements only once
-              unmatchedItems: matchedItems.unmatchedItems,
-              uploadSessionId: uploadSessionId,
-            });
+            const response = await axios.post(
+              `${apiUrl}/api/matches`,
+              {
+                accountId: currentSession.account,
+                switchId: currentSession._id,
+                exactMatches: batch, // Send only the current batch
+                probableMatches: matchedItems.probable,
+                similarDetailsMatches: matchedItems.similar,
+                matchedStatements: isFirstBatch
+                  ? matchedItems.matchedStatements
+                  : [], // Send matchedStatements only once
+                unmatchedItems: matchedItems.unmatchedItems,
+                uploadSessionId: uploadSessionId,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+                },
+              }
+            );
 
             console.log(
               `Batch ${Math.ceil(i / batchSize) + 1} sent successfully`

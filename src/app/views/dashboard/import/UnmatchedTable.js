@@ -76,8 +76,14 @@ const UnmatchedItems = () => {
       const switchId = currentSession._id;
       try {
         const response = await axios.get(
-          `${apiUrl}/api/matches/${switchId}?type=unmatched`
+          `${apiUrl}/api/matches/${switchId}?type=unmatched`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            },
+          }
         );
+
         const allItems = response.data.data;
 
         // Separate ledger and statement items
