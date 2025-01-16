@@ -78,8 +78,10 @@ export const navigations = [
       },
       {
         name: "Reset Working Month",
-        path: "/dashboard/note-8c-9e",
+        path: "/dashboard/reset-month",
         color: "#1a2038",
+        type: "modal",
+        callback: "handleOpenResetMonthModal",
       },
 
       {
@@ -89,12 +91,14 @@ export const navigations = [
       },
       {
         name: "Unlock Account(s)",
-        path: "/dashboard/note-15c-18c",
+        path: "/dashboard/unlock-account",
         color: "#1a2038",
+        type: "modal",
+        callback: "handleOpenUnlockAccountModal",
       },
       {
         name: "Mass change working month",
-        path: "/dashboard/note-15c-18c",
+        path: "/dashboard/mass-change",
         color: "#1a2038",
       },
     ],
@@ -108,7 +112,7 @@ export const navigations = [
     children: [
       {
         name: "Summary",
-        path: "/dashboard/note-8c-9e",
+        path: "/dashboard/aggregrate-summary",
         color: "#1a2038",
       },
     ],

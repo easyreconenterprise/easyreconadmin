@@ -19,7 +19,7 @@ const Container = styled("div")(({ theme }) => ({
   },
 }));
 
-const DeleteAct = () => {
+const MassChange = () => {
   const [values, setValues] = useState([]);
   const [reason, setReason] = useState("");
 
@@ -49,29 +49,8 @@ const DeleteAct = () => {
   return (
     <>
       <Container>
-        <label
-          htmlFor="reason"
-          style={{ display: "block", marginTop: "1rem", fontWeight: "800" }}
-        >
-          Select Reason:
-        </label>
-        <select
-          id="reason"
-          name="reason"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "0.5rem",
-            marginTop: "0.5rem",
-            marginBottom: "1rem",
-          }}
-        >
-          <option value="">Select a reason</option>
-          <option value="Wrongly Created">Wrongly Created</option>
-          <option value="Mistake">Mistake</option>
-          <option value="No Longer Needed">No Longer Needed</option>
-        </select>
+        <Box style={{ fontWeight: "800" }}>Mass Change Working Month</Box>
+        <br></br>
 
         <Box style={{ marginTop: "1rem" }}>
           <label
@@ -82,7 +61,7 @@ const DeleteAct = () => {
               fontWeight: "800",
             }}
           >
-            Select Accounts to Delete:
+            Select Account(s)
           </label>
           <FormGroup>
             <FormControlLabel
@@ -114,14 +93,20 @@ const DeleteAct = () => {
             />
           </FormGroup>
         </Box>
-
+        <Button
+          variant="contained"
+          onClick={handleDelete}
+          style={{ marginTop: "1rem" }}
+        >
+          Change
+        </Button>
         <Button
           variant="contained"
           color="error"
           onClick={handleDelete}
           style={{ marginTop: "1rem" }}
         >
-          Delete Selected Accounts
+          Cancel
         </Button>
 
         <ToastContainer />
@@ -130,4 +115,4 @@ const DeleteAct = () => {
   );
 };
 
-export default DeleteAct;
+export default MassChange;

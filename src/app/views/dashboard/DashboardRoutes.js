@@ -85,6 +85,11 @@ import UserAdmin from "./forms/UserAdmin";
 import UserAssign from "./forms/UserAssign";
 import DeleteAct from "./forms/DeleteAct";
 import AccountTitle from "./forms/AccountTitle";
+import ResetMonth from "./forms/ResetMonth";
+import ResetLayout from "./forms/ResetLayout";
+import UnlockLayout from "./forms/UnlockLayout";
+import MassChange from "./forms/MassChange";
+import AgSum from "./forms/AgSum";
 
 // import SwitchAccount from 'app/components/MatxLayout/Layout1/SwitchAccount'
 
@@ -93,6 +98,10 @@ const Analytics = Loadable(lazy(() => import("./Analytics")));
 const dashboardRoutes = [
   // { path: '/dashboard/default', element: <Analytics />, auth: authRoles.admin },
   { path: "/dashboard/admin", element: <Admin /> },
+  { path: "/dashboard/reset-month", element: <ResetLayout /> },
+  { path: "/dashboard/aggregrate-summary", element: <AgSum /> },
+  { path: "/dashboard/unlock-account", element: <UnlockLayout /> },
+  { path: "/dashboard/mass-change", element: <MassChange /> },
   { path: "/dashboard/student_add", element: <Form /> },
   { path: "/dashboard/create-new", element: <CreateNew /> },
   { path: "/dashboard/matching-rule", element: <Matching /> },
@@ -154,6 +163,7 @@ const dashboardRoutes = [
   { path: "/dashboard/user-assignment", element: <UserAssign /> },
   { path: "/dashboard/delete-account", element: <DeleteAct /> },
   { path: "/dashboard/account-title", element: <AccountTitle /> },
+
   { path: "/dashboard/create-domain", element: <CreateDomain /> },
   {
     path: "/dashboard/AtmMatching",
