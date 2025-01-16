@@ -58,22 +58,22 @@ export const navigations = [
       },
       {
         name: "User Account Assignment",
-        path: "/dashboard/note-1",
+        path: "/dashboard/user-assignment",
         color: "#1a2038",
       },
       {
         name: "New Account Setup",
-        path: "/dashboard/note-1-3",
+        path: "/dashboard/frmAccountDialog",
         color: "#1a2038",
       },
       {
         name: "Delete Account",
-        path: "/dashboard/note-3e-p",
+        path: "/dashboard/delete-account",
         color: "#1a2038",
       },
       {
         name: "Account Title & Stmt Path",
-        path: "/dashboard/note-4-8b",
+        path: "/dashboard/account-title",
         color: "#1a2038",
       },
       {
@@ -89,6 +89,11 @@ export const navigations = [
       },
       {
         name: "Unlock Account(s)",
+        path: "/dashboard/note-15c-18c",
+        color: "#1a2038",
+      },
+      {
+        name: "Mass change working month",
         path: "/dashboard/note-15c-18c",
         color: "#1a2038",
       },

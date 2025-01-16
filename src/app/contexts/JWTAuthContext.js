@@ -86,7 +86,6 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Checking for stored token and user:");
       console.log("jwtToken:", jwtToken);
-      console.log("storedUser:", storedUser);
 
       if (jwtToken && isValidToken(jwtToken)) {
         console.log("Token is valid, setting session");

@@ -82,6 +82,10 @@ import UnmatchedItems from "./import/UnmatchedTable";
 import AllAccount from "./forms/AllAccount";
 import AllDomain from "./forms/AllDomain";
 import UserAdmin from "./forms/UserAdmin";
+import UserAssign from "./forms/UserAssign";
+import DeleteAct from "./forms/DeleteAct";
+import AccountTitle from "./forms/AccountTitle";
+
 // import SwitchAccount from 'app/components/MatxLayout/Layout1/SwitchAccount'
 
 const Analytics = Loadable(lazy(() => import("./Analytics")));
@@ -102,6 +106,7 @@ const dashboardRoutes = [
   { path: "/dashboard/profile", element: <Profile /> },
   { path: "/dashboard/query", element: <Query /> },
   { path: "/dashboard/drag", element: <Drag /> },
+
   { path: "/dashboard/file-import", element: <FileImport /> },
   { path: "/dashboard/financial-position", element: <IncomeFs /> },
   { path: "/dashboard/NewFs", element: <NewFs /> },
@@ -146,6 +151,9 @@ const dashboardRoutes = [
   { path: "/dashboard/all-account", element: <AllAccount /> },
   { path: "/dashboard/all-domain", element: <AllDomain /> },
   { path: "/dashboard/user-administration", element: <UserAdmin /> },
+  { path: "/dashboard/user-assignment", element: <UserAssign /> },
+  { path: "/dashboard/delete-account", element: <DeleteAct /> },
+  { path: "/dashboard/account-title", element: <AccountTitle /> },
   { path: "/dashboard/create-domain", element: <CreateDomain /> },
   {
     path: "/dashboard/AtmMatching",
