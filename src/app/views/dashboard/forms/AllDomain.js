@@ -9,7 +9,7 @@ const AllDomain = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const apiUrl = process.env.REACT_APP_API_URL.trim();
   useEffect(() => {
     const fetchAccounts = async () => {
       // Log the currentSession for debugging
@@ -30,14 +30,11 @@ const AllDomain = () => {
           affiliate: currentSession.affiliate,
         });
 
-        const response = await axios.get(
-          `http://localhost:7000/api/all-domain`,
-          {
-            params: {
-              affiliateId: currentSession.affiliate, // Updated field name
-            },
-          }
-        );
+        const response = await axios.get(`${apiUrl}/api/all-domain`, {
+          params: {
+            affiliateId: currentSession.affiliate, // Updated field name
+          },
+        });
 
         console.log("Accounts fetched:", response.data);
         setAccounts(response.data);

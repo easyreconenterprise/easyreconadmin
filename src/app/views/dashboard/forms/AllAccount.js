@@ -9,7 +9,7 @@ const AllAccount = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const apiUrl = process.env.REACT_APP_API_URL.trim();
   useEffect(() => {
     const fetchAccounts = async () => {
       // Log the currentSession for debugging
@@ -32,7 +32,7 @@ const AllAccount = () => {
           domain: currentSession.domain,
         });
 
-        const response = await axios.get(`http://localhost:7000/api/accounts`, {
+        const response = await axios.get(`${apiUrl}/api/accounts`, {
           params: {
             affiliateId: currentSession.affiliate, // Updated field name
             domainId: currentSession.domain, // Updated field name
