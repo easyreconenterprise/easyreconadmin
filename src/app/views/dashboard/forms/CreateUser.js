@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useContext } from "react";
+
 import { Box, FormGroup, FormControlLabel, Checkbox } from "@mui/material";
 
 import Button from "@mui/material/Button";
@@ -6,7 +8,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
-import { React, useContext, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,9 +62,33 @@ export default function CreateUser({ updateTableData }) {
     affiliates: [],
     activeDays: [],
   });
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    affiliateId: "",
+    passwordExpiresOn: null,
+    logOnTime: null,
+  });
   const [open, setOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
+  const [affiliates, setAffiliates] = useState([]);
+  useEffect(() => {
+    const fetchAffiliates = async () => {
+      try {
+        const response = await axios.get(`${apiUrl}/api/affiliates`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        });
+        setAffiliates(response.data);
+      } catch (err) {
+        console.error("Error fetching affiliates:", err);
+        toast.error("Error fetching affiliates");
+      }
+    };
+    fetchAffiliates();
+  }, [apiUrl]);
 
   function handleClickOpen() {
     setOpen(true);
@@ -272,20 +298,41 @@ export default function CreateUser({ updateTableData }) {
                 >
                   Domicile Affiate
                 </label>
-                <select
-                  id="role"
-                  name="role"
+
+                <TextField
+                  select
+                  variant="outlined"
+                  name="affiliateId"
+                  value={formData.affiliateId}
+                  onChange={handleChange}
+                  required
                   style={{
                     width: "100%",
                     padding: "0.5rem",
                     marginTop: "0.5rem",
                     marginBottom: "1rem",
                   }}
+                  SelectProps={{ native: true }}
                 >
-                  <option value="Account Officer">Parkway Affliate</option>
-                  <option value="Administrator">Administrator</option>
-                  <option value="Supervisor">Supervisor</option>
-                </select>
+                  <option
+                    value=""
+                    disabled
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem",
+                      marginTop: "0.5rem",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    Select an Affiliate
+                  </option>
+                  {affiliates.map((affiliate) => (
+                    <option key={affiliate._id} value={affiliate._id}>
+                      {affiliate.affiliateName}{" "}
+                      {/* Adjust according to the affiliate object structure */}
+                    </option>
+                  ))}
+                </TextField>
                 <Box style={{ marginTop: "1rem" }}>
                   <label
                     htmlFor="affiliates"
