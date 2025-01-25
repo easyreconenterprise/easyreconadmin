@@ -61,7 +61,7 @@ const UserAdmin = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL.trim();
   const [users, setUsers] = useState([]);
-  const apiUrl = process.env.REACT_APP_API_URL;
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
