@@ -14,7 +14,7 @@ import { Paragraph } from "app/components/Typography";
 import useAuth from "app/hooks/useAuth";
 import { Formik } from "formik";
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import * as Yup from "yup";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -71,20 +71,49 @@ const Reset = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
+  const location = useLocation();
   const [selectedLanguage, setSelectedLanguage] = useState("en"); // Add state for language selection
+  const token = new URLSearchParams(location.search).get("token");
+
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const { login } = useAuth();
 
   const handleFormSubmit = async (values) => {
     setLoading(true);
+
+    console.log("Password reset request initiated...");
+    console.log("Token:", token);
+
     try {
-      await login(values.email, values.password);
-      navigate("/");
-    } catch (e) {
+      const response = await fetch(`${apiUrl}/api/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
+          password: values.password,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Password reset successful:", data);
+
+        // Redirect to login
+        navigate("/session/signin");
+      } else {
+        const errorData = await response.json();
+        console.error("Password reset failed:", errorData);
+        alert(errorData.message || "Password reset failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during password reset:", error);
+      alert("An unexpected error occurred. Please try again.");
+    } finally {
       setLoading(false);
     }
   };
+
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -127,7 +156,7 @@ const Reset = () => {
                           textAlign: "center",
                         }}
                       >
-                        Reset Password to Easy Recon
+                        Reset your password for Easy Recon
                       </h6>
                     </bold>
                     <bold>
@@ -155,7 +184,6 @@ const Reset = () => {
                       onChange={handleChange}
                       helperText={touched.password && errors.password}
                       error={Boolean(errors.password && touched.password)}
-                      sx={{ mb: 1.5 }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -187,13 +215,6 @@ const Reset = () => {
                     >
                       Reset Password
                     </LoadingButton>
-
-                    <div>
-                      <div>
-                        <span>Dont have an account?</span>
-                        <a href="/session/signup">Register</a>
-                      </div>
-                    </div>
                   </form>
                 )}
               </Formik>
