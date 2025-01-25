@@ -1,7 +1,65 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { styled } from "@mui/material/styles";
+import { Box, Button } from "@mui/material";
+import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import { ToastContainer, toast } from "react-toastify";
+import { InputAdornment, IconButton } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Breadcrumb, SimpleCard } from "app/components";
+import SimpleTable from "app/views/material-kit/tables/SimpleTable";
+import { SessionContext } from "app/components/MatxLayout/SwitchContext";
+import CreateUser from "./CreateUser";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import EditUser from "./EditUser";
+
+const Container = styled("div")(({ theme }) => ({
+  margin: "30px",
+  [theme.breakpoints.down("sm")]: { margin: "16px" },
+  "& .breadcrumb": {
+    marginBottom: "30px",
+    [theme.breakpoints.down("sm")]: { marginBottom: "16px" },
+  },
+}));
+
+const TextField = styled(TextValidator)(() => ({
+  width: "100%",
+  marginBottom: "16px",
+}));
 
 const UserAdmin = () => {
+  const navigate = useNavigate();
+
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const [states, setStates] = useState({
+    checkedA: false,
+    checkedB: true,
+    checkedC: false,
+    checkedD: true,
+    checkedE: true,
+    checkedF: true,
+    checkedG: false,
+    checkedH: false,
+    checkedI: false,
+    checkedJ: false,
+    checkedK: false,
+    checkedL: true,
+    checkedM: false,
+    checkedN: false,
+    checkedO: false,
+    checkedP: false,
+    checkedQ: false,
+    checkedR: false,
+    checkedS: false,
+    checkedT: false,
+    checkedU: false,
+    checkedV: false,
+    checkedW: false,
+  });
+
+  const apiUrl = process.env.REACT_APP_API_URL.trim();
   const [users, setUsers] = useState([]);
   const apiUrl = process.env.REACT_APP_API_URL;
   useEffect(() => {
@@ -22,8 +80,14 @@ const UserAdmin = () => {
   }, []);
 
   return (
-    <div>
-      <h2>Application Users</h2>
+    <Container>
+      <Box>
+        <h2>Application user</h2>
+      </Box>
+
+      <Box className="breadcrumb">
+        <CreateUser />
+      </Box>
       <table className="table">
         <thead>
           <tr style={{ textDecoration: "underline 2px" }}>
@@ -42,7 +106,15 @@ const UserAdmin = () => {
           ))}
         </tbody>
       </table>
-    </div>
+
+      {selectedUser && (
+        <EditUser
+          user={selectedUser}
+          closeModal={() => setSelectedUser(null)}
+        />
+      )}
+      <ToastContainer />
+    </Container>
   );
 };
 
