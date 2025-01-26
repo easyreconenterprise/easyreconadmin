@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { styled } from "@mui/material/styles";
 import DialogActions from "@mui/material/DialogActions";
 import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -9,6 +10,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import { SessionContext } from "app/components/MatxLayout/SwitchContext";
 
 const Container = styled("div")(({ theme }) => ({
   margin: "30px",
@@ -22,28 +24,88 @@ const Container = styled("div")(({ theme }) => ({
 const DeleteAct = () => {
   const [values, setValues] = useState([]);
   const [reason, setReason] = useState("");
+  const navigate = useNavigate();
+  const { currentSession } = useContext(SessionContext); // Context providing affiliateId and domainId
+  const [accounts, setAccounts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL.trim();
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      // Log the currentSession for debugging
+      console.log("Current Session:", currentSession);
 
-  const handleAffiliateChange = (event, account) => {
-    if (event.target.checked) {
-      setValues((prev) => [...prev, account]);
-    } else {
-      setValues((prev) => prev.filter((item) => item !== account));
-    }
-  };
+      // Check if affiliate and domain exist in currentSession
+      if (!currentSession?.affiliate || !currentSession?.domain) {
+        setError("Affiliate and Domain are required.");
+        console.log("Missing IDs:", {
+          affiliate: currentSession?.affiliate,
+          domain: currentSession?.domain,
+        });
+        setLoading(false);
+        return;
+      }
 
-  const handleDelete = () => {
+      try {
+        console.log("Fetching accounts with IDs:", {
+          affiliate: currentSession.affiliate,
+          domain: currentSession.domain,
+        });
+
+        const response = await axios.get(`${apiUrl}/api/accounts`, {
+          params: {
+            affiliateId: currentSession.affiliate, // Updated field name
+            domainId: currentSession.domain, // Updated field name
+          },
+        });
+
+        console.log("Accounts fetched:", response.data);
+        setAccounts(response.data);
+      } catch (err) {
+        console.error("Error fetching accounts:", err);
+        setError(
+          err.response?.data?.message || "Failed to fetch accounts. Try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccounts();
+  }, [currentSession]);
+
+  const handleDelete = async () => {
     if (!reason) {
       toast.error("Please select a reason for deletion");
       return;
     }
 
-    if (values.length === 0) {
+    if (selectedAccounts.length === 0) {
       toast.error("Please select at least one account to delete");
       return;
     }
 
-    // Simulate delete request
-    toast.success("Accounts deleted successfully!");
+    try {
+      for (const accountId of selectedAccounts) {
+        await axios.delete(`${apiUrl}/api/account/${accountId}`);
+      }
+      toast.success("Accounts deleted successfully!");
+      setAccounts((prev) =>
+        prev.filter((account) => !selectedAccounts.includes(account._id))
+      );
+      setSelectedAccounts([]);
+      setReason("");
+    } catch (err) {
+      toast.error("Error deleting accounts. Try again.");
+    }
+  };
+
+  const handleCheckboxChange = (accountId) => {
+    setSelectedAccounts((prev) =>
+      prev.includes(accountId)
+        ? prev.filter((id) => id !== accountId)
+        : [...prev, accountId]
+    );
   };
 
   return (
@@ -85,33 +147,18 @@ const DeleteAct = () => {
             Select Accounts to Delete:
           </label>
           <FormGroup>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={values.includes("Parkway FFLIARE")}
-                  onChange={(e) => handleAffiliateChange(e, "Parkway FFLIARE")}
-                />
-              }
-              label="Parkway FFLIARE"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={values.includes("Administrator")}
-                  onChange={(e) => handleAffiliateChange(e, "Administrator")}
-                />
-              }
-              label="Administrator"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={values.includes("Supervisor")}
-                  onChange={(e) => handleAffiliateChange(e, "Supervisor")}
-                />
-              }
-              label="Supervisor"
-            />
+            {accounts.map((account) => (
+              <FormControlLabel
+                key={account._id}
+                control={
+                  <Checkbox
+                    checked={selectedAccounts.includes(account._id)}
+                    onChange={() => handleCheckboxChange(account._id)}
+                  />
+                }
+                label={account.accountTitle}
+              />
+            ))}
           </FormGroup>
         </Box>
 
