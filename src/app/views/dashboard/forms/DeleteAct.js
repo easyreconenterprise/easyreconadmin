@@ -28,9 +28,9 @@ const DeleteAct = () => {
   const { currentSession } = useContext(SessionContext); // Context providing affiliateId and domainId
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [accounts, setAccounts] = useState([]);
+
   const [selectedAccounts, setSelectedAccounts] = useState([]);
-  const [reason, setReason] = useState("");
+
   const [error, setError] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL.trim();
   useEffect(() => {
