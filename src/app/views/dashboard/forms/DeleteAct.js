@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import DialogActions from "@mui/material/DialogActions";
 import { ToastContainer, toast } from "react-toastify";
@@ -24,10 +24,13 @@ const Container = styled("div")(({ theme }) => ({
 const DeleteAct = () => {
   const [values, setValues] = useState([]);
   const [reason, setReason] = useState("");
-  const navigate = useNavigate();
+
   const { currentSession } = useContext(SessionContext); // Context providing affiliateId and domainId
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [accounts, setAccounts] = useState([]);
+  const [selectedAccounts, setSelectedAccounts] = useState([]);
+  const [reason, setReason] = useState("");
   const [error, setError] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL.trim();
   useEffect(() => {
