@@ -215,6 +215,7 @@ const SwitchAccount = ({ open, onClose }) => {
   const [affiliates, setAffiliates] = useState([]);
   const [domains, setDomains] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [workingMonths, setWorkingMonths] = useState([]);
   const { switchSession } = useContext(SessionContext); // Access the switchSession function
 
   // Handle form data change
@@ -299,16 +300,59 @@ const SwitchAccount = ({ open, onClose }) => {
   }, [formData.affiliateId, apiUrl]);
 
   // Fetch accounts for the selected domain
+  // useEffect(() => {
+  //   const fetchAccounts = async () => {
+  //     if (formData.domainId) {
+  //       try {
+  //         const token = localStorage.getItem("jwtToken");
+  //         const response = await axios.get(
+  //           `${apiUrl}/api/accounts/${formData.domainId}`,
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${token}`,
+  //             },
+  //           }
+  //         );
+  //         setAccounts(response.data);
+  //       } catch (err) {
+  //         console.error("Error fetching accounts:", err);
+  //         toast.error("Error fetching accounts");
+  //       }
+  //     }
+  //   };
+  //   fetchAccounts();
+  // }, [formData.domainId, apiUrl]);
+  // useEffect(() => {
+  //   const fetchAccounts = async () => {
+  //     if (formData.domainId && formData.selectedMonth) {
+  //       try {
+  //         const token = localStorage.getItem("jwtToken");
+  //         const response = await axios.get(
+  //           `${apiUrl}/api/accounts/${formData.domainId}?month=${formData.selectedMonth}`,
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${token}`,
+  //             },
+  //           }
+  //         );
+  //         setAccounts(response.data);
+  //       } catch (err) {
+  //         console.error("Error fetching accounts:", err);
+  //         toast.error("Error fetching accounts");
+  //       }
+  //     }
+  //   };
+  //   fetchAccounts();
+  // }, [formData.domainId, formData.selectedMonth, apiUrl]);
   useEffect(() => {
     const fetchAccounts = async () => {
       if (formData.domainId) {
         try {
-          const token = localStorage.getItem("jwtToken");
           const response = await axios.get(
             `${apiUrl}/api/accounts/${formData.domainId}`,
             {
               headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
               },
             }
           );
@@ -321,35 +365,58 @@ const SwitchAccount = ({ open, onClose }) => {
     };
     fetchAccounts();
   }, [formData.domainId, apiUrl]);
+  // useEffect(() => {
+  //   if (formData.accountId) {
+  //     const selectedAccount = accounts.find(
+  //       (account) => account._id === formData.accountId
+  //     );
+  //     if (selectedAccount && selectedAccount.balanceAsPerLedgerDate) {
+  //       const balanceDate = selectedAccount.balanceAsPerLedgerDate;
+
+  //       // Safely accessing $date and $numberLong
+  //       let timestamp = null;
+  //       if (balanceDate.$date && balanceDate.$date.$numberLong) {
+  //         timestamp = parseInt(balanceDate.$date.$numberLong, 10); // Extract timestamp from $numberLong
+  //       } else if (
+  //         typeof balanceDate === "string" ||
+  //         typeof balanceDate === "number"
+  //       ) {
+  //         timestamp = new Date(balanceDate).getTime(); // In case it's a regular date string or timestamp
+  //       }
+
+  //       if (timestamp) {
+  //         const month = formatMonthYear(timestamp);
+  //         setFormData((prevFormData) => ({
+  //           ...prevFormData,
+  //           month, // Set the extracted month in the formData
+  //         }));
+  //       }
+  //     }
+  //   }
+  // }, [formData.accountId, accounts]);
+
+  // Fetch working months for the selected account
   useEffect(() => {
-    if (formData.accountId) {
-      const selectedAccount = accounts.find(
-        (account) => account._id === formData.accountId
-      );
-      if (selectedAccount && selectedAccount.balanceAsPerLedgerDate) {
-        const balanceDate = selectedAccount.balanceAsPerLedgerDate;
-
-        // Safely accessing $date and $numberLong
-        let timestamp = null;
-        if (balanceDate.$date && balanceDate.$date.$numberLong) {
-          timestamp = parseInt(balanceDate.$date.$numberLong, 10); // Extract timestamp from $numberLong
-        } else if (
-          typeof balanceDate === "string" ||
-          typeof balanceDate === "number"
-        ) {
-          timestamp = new Date(balanceDate).getTime(); // In case it's a regular date string or timestamp
-        }
-
-        if (timestamp) {
-          const month = formatMonthYear(timestamp);
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            month, // Set the extracted month in the formData
-          }));
+    const fetchWorkingMonths = async () => {
+      if (formData.accountId) {
+        try {
+          const response = await axios.get(
+            `${apiUrl}/api/accounts/${formData.accountId}/months`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+              },
+            }
+          );
+          setWorkingMonths(response.data); // Set the working months
+        } catch (err) {
+          console.error("Error fetching working months:", err);
+          toast.error("Error fetching working months");
         }
       }
-    }
-  }, [formData.accountId, accounts]);
+    };
+    fetchWorkingMonths();
+  }, [formData.accountId, apiUrl]);
 
   return (
     <Container>
@@ -411,16 +478,23 @@ const SwitchAccount = ({ open, onClose }) => {
                 required
                 disabled={!formData.domainId} // Disable if no domain is selected
               >
-                {accounts.map((account) => (
+                {/*} {accounts.map((account) => (
                   <MenuItem key={account._id} value={account._id}>
                     {account.accountTitle}{" "}
-                    {/* Assuming account has a 'name' property */}
+                 
                   </MenuItem>
-                ))}
+                ))}*/}
+
+                {accounts
+                  .filter((account) => !account.parentAccountId) // Filter for parent accounts
+                  .map((account) => (
+                    <MenuItem key={account._id} value={account._id}>
+                      {account.accountTitle}
+                    </MenuItem>
+                  ))}
               </TextField>
 
-              {/* Month Selection */}
-              <label>Internal Working Month</label>
+              {/*<label>Internal Working Month</label>
               <TextField
                 label="Working Month"
                 name="month"
@@ -430,7 +504,25 @@ const SwitchAccount = ({ open, onClose }) => {
                 fullWidth
                 required
                 disabled
-              />
+              />*/}
+
+              <label>Working Month</label>
+              <TextField
+                select
+                label="Working Month"
+                name="month"
+                value={formData.month}
+                onChange={handleChange}
+                fullWidth
+                required
+                disabled={!workingMonths.length}
+              >
+                {workingMonths.map((month) => (
+                  <MenuItem key={month} value={month}>
+                    {month}
+                  </MenuItem>
+                ))}
+              </TextField>
               <Button
                 color="primary"
                 variant="contained"

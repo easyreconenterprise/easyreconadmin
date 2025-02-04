@@ -10,7 +10,10 @@ import { Box, styled, useTheme } from "@mui/system";
 import { MatxMenu, MatxSearchBox } from "app/components";
 import { themeShadows } from "app/components/MatxTheme/themeColors";
 import useAuth from "app/hooks/useAuth";
-
+import moment from "moment";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import useSettings from "app/hooks/useSettings";
 import { topBarHeight } from "app/utils/constant";
 import React, { useState, useEffect, useContext } from "react";
@@ -83,6 +86,8 @@ const Layout1Topbar = () => {
   const { settings, updateSettings } = useSettings();
   const { logout, user } = useAuth();
   const [confirmMode, setConfirmMode] = useState(false);
+  // const { currentSession } = useContext(SessionContext);
+  const [isSessionLoaded, setIsSessionLoaded] = useState(false);
 
   const [openModal, setOpenModal] = useState(false);
   const [openWorkingMonthModal, setOpenWorkingMonthModal] = useState(false);
@@ -129,11 +134,295 @@ const Layout1Topbar = () => {
 
     handleCloseModal();
   };
-  const handleSubmitWorkingModal = (formData) => {
-    // Add your logic for handling form submission here
-    console.log(formData);
+  const apiUrl = process.env.REACT_APP_API_URL; // This should be set in your .env file
 
-    handleCloseModal();
+  // const handleSubmitWorkingModal = async (formData) => {
+  //   const token = localStorage.getItem("jwtToken");
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL.trim()}/api/account/working-month`,
+  //       formData,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     toast.success("Working month set successfully!");
+  //     handleCloseWorkingMonthModal(); // Close the modal after success
+  //     window.location.reload(); // Refresh to reflect the changes (optional)
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     toast.error("Unable to set working month.");
+  //   }
+  // };
+
+  // const handleSubmitWorkingModal = async (formData) => {
+  //   const token = localStorage.getItem("jwtToken");
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL.trim()}/api/account/working-month`,
+  //       formData,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     // Display a success message with account details
+  //     toast.success(
+  //       `Working month set successfully for ${response.data.accountTitle}!`
+  //     );
+
+  //     // ✅ Remove the undefined onSubmit call
+  //     // Just close the modal after success
+  //     handleCloseWorkingMonthModal();
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     toast.error("Unable to set working month.");
+  //   }
+  // };
+
+  // const handleSubmitWorkingModal = async (formData) => {
+  //   const token = localStorage.getItem("jwtToken");
+
+  //   // Ensure accountId from the session
+  //   const accountId = currentSession?.account?._id || ""; // Adjust this line
+
+  //   if (!accountId || !formData.month) {
+  //     toast.error("Account ID or month is missing!");
+  //     console.log("Error: Account ID or month is missing!");
+  //     return;
+  //   }
+
+  //   console.log("Sending data to API:", { accountId, month: formData.month });
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL.trim()}/api/account/working-month`,
+  //       {
+  //         accountId,
+  //         month: formData.month, // Only the month name is needed
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     console.log("API Response:", response.data);
+
+  //     toast.success(
+  //       `Working month set successfully for ${response.data.accountTitle}!`
+  //     );
+
+  //     handleCloseWorkingMonthModal();
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     toast.error("Unable to set working month.");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const fetchAccountDetails = async () => {
+  //     if (currentSession?.account) {
+  //       console.log("Fetching account details for:", currentSession.account);
+  //       try {
+  //         const token = localStorage.getItem("jwtToken");
+
+  //         // Assuming apiUrl is available in your environment variables or props
+  //         const response = await axios.get(
+  //           `${process.env.REACT_APP_API_URL}/api/account/${currentSession.account}`,
+  //           {
+  //             headers: {
+  //               Authorization: `Bearer ${token}`,
+  //             },
+  //           }
+  //         );
+
+  //         // Just mark session as loaded
+  //         setIsSessionLoaded(true);
+  //       } catch (err) {
+  //         console.error("Error fetching account details:", err);
+  //         setIsSessionLoaded(true); // Ensure session is marked as loaded even on error
+  //       }
+  //     }
+  //   };
+
+  //   fetchAccountDetails();
+  // }, [currentSession?.account]); // Just depend on the currentSession.account
+  useEffect(() => {
+    const fetchAccountDetails = async () => {
+      if (currentSession?.account) {
+        console.log("Fetching account details for:", currentSession.account);
+        try {
+          const token = localStorage.getItem("jwtToken");
+
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/account/${currentSession.account}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          // Save the fetched data into your state
+          setIsSessionLoaded(true);
+        } catch (err) {
+          console.error("Error fetching account details:", err);
+          setIsSessionLoaded(true); // Ensure session is marked as loaded even on error
+        }
+      }
+    };
+
+    fetchAccountDetails();
+  }, [currentSession?.account]); // Depend on the currentSession.account
+
+  // const handleSubmitWorkingModal = async (formData) => {
+  //   if (!isSessionLoaded) {
+  //     toast.error("Please wait until the session data is fully loaded.");
+  //     console.log("Session data not yet loaded.");
+  //     return;
+  //   }
+
+  //   const token = localStorage.getItem("jwtToken");
+
+  //   // Ensure accountId from the session
+  //   const accountId = currentSession?.account || ""; // Directly use accountId from currentSession
+
+  //   if (!accountId || !formData.month) {
+  //     toast.error("Account ID or month is missing!");
+  //     console.log("Error: Account ID or month is missing!");
+  //     return;
+  //   }
+
+  //   console.log("Sending data to API:", { accountId, month: formData.month });
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL.trim()}/api/account/working-month`,
+  //       {
+  //         accountId, // Use the accountId directly
+  //         month: formData.month, // Only the month name is needed
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     console.log("API Response:", response.data);
+
+  //     toast.success(
+  //       `Working month set successfully for ${response.data.accountTitle}!`
+  //     );
+
+  //     handleCloseWorkingMonthModal();
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     toast.error("Unable to set working month.");
+  //   }
+  // };
+  // const handleSubmitWorkingModal = async (formData) => {
+  //   if (!isSessionLoaded) {
+  //     toast.error("Please wait until the session data is fully loaded.");
+  //     return;
+  //   }
+
+  //   const token = localStorage.getItem("jwtToken");
+  //   const accountId = currentSession?.account || "";
+
+  //   if (!accountId || !formData.month) {
+  //     toast.error("Account ID or month is missing!");
+  //     return;
+  //   }
+
+  //   console.log("Sending data to API:", { accountId, month: formData.month });
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL.trim()}/api/account/working-month`,
+  //       {
+  //         accountId,
+  //         month: formData.month, // Send month as a string like "September"
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     console.log("API Response:", response.data);
+  //     toast.success(
+  //       `Working month set successfully for ${response.data.accountTitle}!`
+  //     );
+
+  //     handleCloseWorkingMonthModal();
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     toast.error("Unable to set working month.");
+  //   }
+  // };
+  // const handleSubmitWorkingModal = async (formData) => {
+  //   if (!isSessionLoaded) {
+  //     toast.error("Please wait until the session data is fully loaded.");
+  //     return;
+  //   }
+
+  //   const token = localStorage.getItem("jwtToken");
+  //   const accountId = currentSession?.account || ""; // Use the parentAccountId
+
+  //   if (!accountId || !formData.month) {
+  //     toast.error("Account ID or month is missing!");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_API_URL}/api/account/working-month`,
+  //       { accountId, month: formData.month },
+  //       { headers: { Authorization: `Bearer ${token}` } }
+  //     );
+
+  //     toast.success(
+  //       `Working month set for ${response.data.account.accountTitle}`
+  //     );
+  //     handleCloseWorkingMonthModal();
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     toast.error("Unable to set working month.");
+  //   }
+  // };
+  const handleSubmitWorkingModal = async (formData) => {
+    if (!isSessionLoaded) {
+      toast.error("Please wait until the session data is fully loaded.");
+      return;
+    }
+
+    const token = localStorage.getItem("jwtToken");
+    const accountId = currentSession?.account || ""; // Use the account ID from the session
+
+    if (!accountId || !formData.month) {
+      toast.error("Account ID or month is missing!");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/account/working-month`,
+        { accountId, month: formData.month },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success(
+        `Working month set for ${response.data.account.accountTitle}`
+      );
+      handleCloseWorkingMonthModal(); // Close modal after success
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Unable to set working month.");
+    }
   };
 
   const handleOpenWorkingMonthModal = (event) => {
@@ -473,6 +762,7 @@ const Layout1Topbar = () => {
                       open={openWorkingMonthModal}
                       onClose={handleCloseWorkingMonthModal}
                       onSubmit={handleSubmitWorkingModal}
+                      accountId={currentSession?.account}
                       // confirmMode={confirmMode}
                     />
                   )}
