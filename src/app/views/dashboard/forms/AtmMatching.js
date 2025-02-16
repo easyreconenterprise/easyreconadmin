@@ -624,6 +624,35 @@ const AtmMatching = () => {
                 label="User Defined Field Matches"
               />
               <br />
+              <br></br>
+              <br></br>
+              <br></br>
+
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "20px" }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.checkAll}
+                      onChange={handleChange("checkAll")}
+                    />
+                  }
+                  label="Check All"
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={states.AiMatching}
+                      onChange={handleChange("AiMatching")}
+                    />
+                  }
+                  label="AI Matching"
+                />
+              </div>
+
+              <br />
               <Button
                 color="primary"
                 variant="contained"

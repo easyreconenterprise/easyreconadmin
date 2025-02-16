@@ -46,7 +46,7 @@ const initialValues = {
   email: "",
   password: "",
   //   language: "en",
-  language: "",
+  language: "en",
 };
 
 // form field validation schema
@@ -187,28 +187,18 @@ const JwtLogin = () => {
                       }}
                     />
 
-                    <Select
-                      labelId="language-label"
-                      id="language"
+                    <TextField
                       fullWidth
+                      size="small"
                       name="language"
-                      value={values.language}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      displayEmpty
                       label="Language"
-                    >
-                      {/* Placeholder option */}
-                      <MenuItem value="" disabled>
-                        Select Language
-                      </MenuItem>
-                      {languages.map((lang) => (
-                        <MenuItem key={lang.code} value={lang.code}>
-                          {lang.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-
+                      variant="outlined"
+                      value="English"
+                      InputProps={{
+                        readOnly: true,
+                      }}
+                      style={{ marginBottom: "20px" }}
+                    />
                     <LoadingButton
                       type="submit"
                       color="primary"

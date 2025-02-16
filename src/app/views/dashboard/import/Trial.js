@@ -408,13 +408,6 @@ const Trial = () => {
       >
         CANCEL
       </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        style={{ marginLeft: "50px" }}
-      >
-        SKIP
-      </Button>
     </main>
   );
 };
