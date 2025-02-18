@@ -97,6 +97,7 @@ const Layout1Topbar = () => {
     useContext(SessionContext);
 
   const [openSwitchAccountModal, setOpenSwitchAccountModal] = useState(false);
+  const [openKeyInModal, setOpenKeyInModal] = useState(false);
 
   useEffect(() => {
     // Check local storage for 'lastSession' on component mount
@@ -112,14 +113,26 @@ const Layout1Topbar = () => {
       setOpenSwitchAccountModal(false);
     });
   };
+  const handleKeyIn = () => {
+    // Switch account and update UI
+    switchSession().then(() => {
+      setOpenKeyInModal(false);
+    });
+  };
 
   const handleOpenSwitchAccountModal = (event) => {
     event.stopPropagation();
     setOpenSwitchAccountModal(true);
   };
-
+  const handleOpenKeyInModal = (event) => {
+    event.stopPropagation();
+    setOpenKeyInModal(true);
+  };
   const handleCloseSwitchAccountModal = () => {
     setOpenSwitchAccountModal(false);
+  };
+  const handleCloseKeyInModal = () => {
+    setOpenKeyInModal(false);
   };
   const handleOpenModal = (event) => {
     event.stopPropagation();
@@ -495,12 +508,18 @@ const Layout1Topbar = () => {
                     </UserMenu>
                   }
                 >
-                  <StyledItem>
-                    <Link to="/dashboard/key-in">
-                      <Span> Key In </Span>
-                    </Link>
+                  <StyledItem onClick={(event) => handleOpenKeyInModal(event)}>
+                    <Span> Key In</Span>
                   </StyledItem>
 
+                  {/* Render SwitchAccount conditionally */}
+                  {openKeyInModal && (
+                    <KeyIn
+                      open={openKeyInModal}
+                      onClose={handleCloseKeyInModal}
+                      onSubmit={handleKeyIn}
+                    />
+                  )}
                   <StyledItem>
                     <Link to="/dashboard/upload-excel-led">
                       <Span> Upload in Excel Format </Span>
