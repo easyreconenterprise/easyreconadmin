@@ -98,6 +98,7 @@ const Layout1Topbar = () => {
 
   const [openSwitchAccountModal, setOpenSwitchAccountModal] = useState(false);
   const [openKeyInModal, setOpenKeyInModal] = useState(false);
+  const [closeKeyInModal, setCloseKeyInModal] = useState(false);
 
   useEffect(() => {
     // Check local storage for 'lastSession' on component mount
@@ -128,12 +129,16 @@ const Layout1Topbar = () => {
     event.stopPropagation();
     setOpenKeyInModal(true);
   };
+
   const handleCloseSwitchAccountModal = () => {
     setOpenSwitchAccountModal(false);
   };
-  const handleCloseKeyInModal = () => {
-    setOpenKeyInModal(false);
+  const handleCloseKeyInModal = (event) => {
+    // Prevent closing if the click was inside the modal
+
+    setOpenKeyInModal(false); // Close modal only if the click is outside
   };
+
   const handleOpenModal = (event) => {
     event.stopPropagation();
     setOpenModal(true);
