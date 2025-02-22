@@ -27,6 +27,7 @@ import { SessionContext } from "../SwitchContext";
 import WorkingMonth from "./WorkingMonth";
 import ChooseMonth from "./ChooseMonth";
 import RestoreData from "./RestoreData";
+import KeyInStmt from "./KeyInStmt";
 
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary,
@@ -98,6 +99,7 @@ const Layout1Topbar = () => {
 
   const [openSwitchAccountModal, setOpenSwitchAccountModal] = useState(false);
   const [openKeyInModal, setOpenKeyInModal] = useState(false);
+  const [openKeyInStmtModal, setOpenKeyInStmtModal] = useState(false);
   const [closeKeyInModal, setCloseKeyInModal] = useState(false);
 
   useEffect(() => {
@@ -120,6 +122,12 @@ const Layout1Topbar = () => {
       setOpenKeyInModal(false);
     });
   };
+  const handleKeyInStmt = () => {
+    // Switch account and update UI
+    switchSession().then(() => {
+      setOpenKeyInStmtModal(false);
+    });
+  };
 
   const handleOpenSwitchAccountModal = (event) => {
     event.stopPropagation();
@@ -129,6 +137,10 @@ const Layout1Topbar = () => {
     event.stopPropagation();
     setOpenKeyInModal(true);
   };
+  const handleOpenKeyInStmtModal = (event) => {
+    event.stopPropagation();
+    setOpenKeyInStmtModal(true);
+  };
 
   const handleCloseSwitchAccountModal = () => {
     setOpenSwitchAccountModal(false);
@@ -137,6 +149,11 @@ const Layout1Topbar = () => {
     // Prevent closing if the click was inside the modal
 
     setOpenKeyInModal(false); // Close modal only if the click is outside
+  };
+  const handleCloseKeyInStmtModal = (event) => {
+    // Prevent closing if the click was inside the modal
+
+    setOpenKeyInStmtModal(false); // Close modal only if the click is outside
   };
 
   const handleOpenModal = (event) => {
@@ -567,11 +584,20 @@ const Layout1Topbar = () => {
                     </UserMenu>
                   }
                 >
-                  <StyledItem>
-                    <Link to="/dashboard/key-in">
-                      <Span> Key In </Span>
-                    </Link>
+                  <StyledItem
+                    onClick={(event) => handleOpenKeyInStmtModal(event)}
+                  >
+                    <Span> Key In</Span>
                   </StyledItem>
+
+                  {/* Render SwitchAccount conditionally */}
+                  {openKeyInStmtModal && (
+                    <KeyInStmt
+                      open={openKeyInStmtModal}
+                      onClose={handleCloseKeyInStmtModal}
+                      onSubmit={handleKeyInStmt}
+                    />
+                  )}
 
                   <StyledItem>
                     <Link to="/dashboard/upload-excel">
